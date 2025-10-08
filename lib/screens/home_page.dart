@@ -1,8 +1,11 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/widgets/custom_button.dart';
 import 'package:quiz_generator/widgets/custom_text.dart';
+import 'package:quiz_generator/widgets/dashboard_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -74,310 +77,126 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               SizedBox(height: 20.0),
-              Card(
-                elevation: 1, // controls the shadow depth
-                color: AppColors.primaryWhite,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16), // rounded corners
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.lightOrange,
+                  image: DecorationImage(
+                    image: AssetImage(
+                      "assets/images/baa90d53ce81418c61c575ea58c32b6a6851a879.png",
+                    ), // your image
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
+                    scale: 0.4, // makes it cover the entire screen
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 20.0, 0, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                              "assets/images/baa90d53ce81418c61c575ea58c32b6a6851a879.png",
-                            ), // your image
-                            fit: BoxFit
-                                .cover, // makes it cover the entire screen
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 0, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.0,
+                            vertical: 6.0,
                           ),
-                          borderRadius: BorderRadius.circular(16.0),
-                          color: Color(0xFFFEF0EA),
+                          child: CustomText(
+                            title: "Introducing",
+                            size: 10,
+                            color: AppColors.primaryOrange,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 6.0,
-                          vertical: 6.0,
+                        SizedBox(height: 6.0),
+                        CustomText(
+                          title: 'AI Practice Quiz Generator',
+                          size: 16,
+                          color: AppColors.primaryDeepBlack,
+                          fontWeight: FontWeight.w600,
                         ),
-                        child: CustomText(
-                          title: "Introducing",
-                          size: 10,
-                          color: AppColors.primaryOrange,
-                          fontWeight: FontWeight.w400,
+                        SizedBox(height: 8.0),
+                        SizedBox(
+                          width: 300,
+                          child: CustomText(
+                            title:
+                                'Create a custom quiz and get exam ready with practice questions tailored to you.....',
+                            size: 10,
+                            color: AppColors.primaryDeepBlack,
+
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 6.0),
-                      CustomText(
-                        title: 'AI Practice Quiz Generator',
-                        size: 16,
-                        color: AppColors.primaryDeepBlack,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      SizedBox(height: 8.0),
-                      CustomText(
-                        title:
-                            '''Create a custom quiz and get exam ready with practice 
-questions tailored to you.....''',
-                        size: 10,
-                        color: AppColors.primaryLightBlack,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              height: 40,
-                              child: CustomButton(
-                                buttonTitle: 'Take a Practice Quiz Now',
-                                textColor: AppColors.primaryWhite,
-                                textWeight: FontWeight.w500,
-                                textSize: 12,
-                                buttonHeight: 16,
-                                onTap: () {
-                                  // Handle button tap
-                                },
-                                buttonColor: AppColors.primaryOrange,
-                                alignment: Alignment.center,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 40,
+                                child: CustomButton(
+                                  buttonTitle: 'Take a Practice Quiz Now',
+                                  textColor: AppColors.primaryWhite,
+                                  textWeight: FontWeight.w500,
+                                  textSize: 12,
+                                  buttonHeight: 16,
+                                  onTap: () {
+                                    // Handle button tap
+                                  },
+                                  buttonColor: AppColors.primaryOrange,
+                                  alignment: Alignment.center,
+                                ),
                               ),
                             ),
-                          ),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.asset(
-                              'assets/images/online-survey-3d-render-laptop-form-with-ticks 1.png',
-                              fit: BoxFit.cover,
-                              height: 100,
-                              width: 170,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                'assets/images/online-survey-3d-render-laptop-form-with-ticks 1.png',
+                                fit: BoxFit.cover,
+                                height: 100,
+                                width: 170,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(
-                    child: Card(
-                      elevation: 2, // controls the shadow depth
-                      color: AppColors.primaryWhite,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ), // rounded corners
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(
-                              title: "Active Courses",
-                              size: 14,
-                              color: AppColors.primaryLightBlack,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            SizedBox(height: 30),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CustomText(
-                                  title: "00",
-                                  size: 20,
-                                  color: AppColors.primaryDeepBlack,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                // SizedBox(width: 80.0),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 6.0,
-                                    vertical: 6.0,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    color: Color(0xFFFEF0EA),
-                                  ),
-                                  child: ImageIcon(
-                                    AssetImage('assets/icons/Document.png'),
-                                    color: AppColors.primaryOrange,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  DashboardCard(
+                    title: "Active Courses",
+                    value: "00",
+                    iconPath: "assets/icons/Document.png",
                   ),
-                  SizedBox(width: 20),
-                  Expanded(
-                    child: Card(
-                      elevation: 2, // controls the shadow depth
-                      color: AppColors.primaryWhite,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ), // rounded corners
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(
-                              title: "Assigned Exam",
-                              size: 14,
-                              color: AppColors.primaryLightBlack,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            SizedBox(height: 30),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CustomText(
-                                  title: "00",
-                                  size: 20,
-                                  color: AppColors.primaryDeepBlack,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                // SizedBox(width: 80.0),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 6.0,
-                                    vertical: 6.0,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    color: Color(0xFFFEF0EA),
-                                  ),
-                                  child: ImageIcon(
-                                    AssetImage('assets/icons/Document.png'),
-                                    color: AppColors.primaryOrange,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  const SizedBox(width: 20),
+                  DashboardCard(
+                    title: "Assigned Exam",
+                    value: "00",
+                    iconPath: "assets/icons/Document.png",
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(
-                    child: Card(
-                      elevation: 2, // controls the shadow depth
-                      color: AppColors.primaryWhite,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ), // rounded corners
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(
-                              title: "Exam Taken",
-                              size: 14,
-                              color: AppColors.primaryLightBlack,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            SizedBox(height: 30),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CustomText(
-                                  title: "00",
-                                  size: 20,
-                                  color: AppColors.primaryDeepBlack,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                // SizedBox(width: 80.0),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 6.0,
-                                    vertical: 6.0,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    color: Color(0xFFFEF0EA),
-                                  ),
-                                  child: ImageIcon(
-                                    AssetImage('assets/icons/Document.png'),
-                                    color: AppColors.primaryOrange,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  DashboardCard(
+                    title: "Exam Taken",
+                    value: "00",
+                    iconPath: "assets/icons/Document.png",
                   ),
-                  SizedBox(width: 20),
-                  Expanded(
-                    child: Card(
-                      elevation: 2, // controls the shadow depth
-                      color: AppColors.primaryWhite,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ), // rounded corners
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CustomText(
-                              title: "Avg. Performance",
-                              size: 14,
-                              color: AppColors.primaryLightBlack,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            SizedBox(height: 30),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CustomText(
-                                  title: "00",
-                                  size: 20,
-                                  color: AppColors.primaryDeepBlack,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                // SizedBox(width: 80.0),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 6.0,
-                                    vertical: 6.0,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    color: Color(0xFFFEF0EA),
-                                  ),
-                                  child: ImageIcon(
-                                    AssetImage('assets/icons/Document.png'),
-                                    color: AppColors.primaryOrange,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  const SizedBox(width: 20),
+                  DashboardCard(
+                    title: "Avg. Performance",
+                    value: "00",
+                    iconPath: "assets/icons/Document.png",
                   ),
                 ],
               ),
+
               SizedBox(height: 16),
               CustomText(
                 title: "Your Activity",

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quiz_generator/widgets/custom_button.dart';
 
 import '../constant/color.dart';
@@ -36,8 +35,7 @@ class _MockExamState extends State<MockExam> {
                           Text(
                             "Welcome back,",
                             style: TextStyle(
-                              fontFamily:
-                                  GoogleFonts.plusJakartaSans().fontFamily,
+                              fontFamily: 'PlusJakartaSans',
                               fontSize: 14,
                               color: AppColors.primaryOrange,
                               fontWeight: FontWeight.w700,
@@ -47,8 +45,7 @@ class _MockExamState extends State<MockExam> {
                           Text(
                             "Monday,",
                             style: TextStyle(
-                              fontFamily:
-                                  GoogleFonts.plusJakartaSans().fontFamily,
+                             fontFamily: 'PlusJakartaSans',
                               fontSize: 14,
                               color: AppColors.primaryDeepBlack,
                               fontWeight: FontWeight.w700,

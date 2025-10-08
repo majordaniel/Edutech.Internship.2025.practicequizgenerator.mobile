@@ -12,7 +12,6 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.3.2
   flutter_svg: ^2.2.1
 
 dev_dependencies:
@@ -22,6 +21,18 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-VariableFont_opsz_wght.ttf
+        - asset: assets/fonts/Inter-Italic-VariableFont_opsz_wght.ttf
+          style: italic
+  - family: PlusJakartaSans
+    fonts:
+      - asset: assets/fonts/PlusJakartaSans-VariableFont_wght.ttf
+      - asset: assets/fonts/PlusJakartaSans-Italic-VariableFont_wght.ttf
+        style: italic
+
   uses-material-design: true
   assets:
     - assets/images/

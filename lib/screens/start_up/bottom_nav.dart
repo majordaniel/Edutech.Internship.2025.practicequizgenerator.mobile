@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:quiz_generator/screens/Signout_page.dart';
+import 'package:quiz_generator/screens/signout_page.dart';
 import 'package:quiz_generator/screens/mock_exam.dart';
 
 import '../../constant/color.dart';
@@ -50,12 +49,14 @@ class _BottomNavbarState extends State<BottomNavbar> {
         showUnselectedLabels: true,
         selectedItemColor: AppColors.primaryOrange,
         unselectedItemColor: AppColors.primaryGrey,
-        selectedLabelStyle: GoogleFonts.inter(
+        selectedLabelStyle: TextStyle(
+          fontFamily: 'Inter',
           fontSize: 12,
-          fontWeight: FontWeight.w800,
           color: AppColors.primaryOrange,
+          fontWeight: FontWeight.w800
         ),
-        unselectedLabelStyle: GoogleFonts.inter(
+        unselectedLabelStyle: TextStyle(
+          fontFamily: 'Inter',
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: AppColors.primaryGrey,

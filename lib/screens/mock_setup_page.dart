@@ -1,4 +1,3 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/helper/helper.dart';
@@ -159,7 +158,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                 // ),
                 DropdownButtonFormField(
                   dropdownColor: AppColors.primaryWhite,
-                  value: selectedValue,
+                  initialValue: selectedValue,
                   icon: Icon(Icons.keyboard_arrow_down),
                   items: items
                       .map(

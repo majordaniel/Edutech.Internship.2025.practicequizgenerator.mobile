@@ -58,7 +58,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
         unselectedLabelStyle: TextStyle(
           fontFamily: 'Inter',
           fontSize: 12,
-          fontWeight: FontWeight.w500
+          fontWeight: FontWeight.w500,
           color: AppColors.primaryGrey,
         ),
         items: const [

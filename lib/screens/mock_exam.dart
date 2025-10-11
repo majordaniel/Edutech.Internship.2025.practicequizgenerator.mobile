@@ -322,20 +322,93 @@ class _MockExamState extends State<MockExam> {
                   SizedBox(height: 5),
                 ],
               ),
+              SizedBox(height: 10),
               Card(
                 elevation: 2, // controls the shadow depth
                 color: AppColors.primaryWhite,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8), // rounded corners
                 ),
-
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: CustomText(
-                    title: "20 Questions | 30 minutes | Quiz Completed",
-                    size: 12,
-                    color: AppColors.primaryLightBlack,
-                    fontWeight: FontWeight.w500,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        title: "20 Questions | 30 minutes | Quiz Completed",
+                        size: 12,
+                        color: AppColors.primaryLightBlack,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      SizedBox(height: 21),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                title: "Data Science Practice Quiz",
+                                size: 12,
+                                color: AppColors.primaryLightBlack,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              SizedBox(height: 8),
+                              CustomText(
+                                title: "Computer Science",
+                                size: 10,
+                                color: AppColors.primaryLightBlack,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              SizedBox(height: 8),
+                              CustomText(
+                                title: "75% Correct",
+                                size: 16,
+                                color: AppColors.primaryLightBlack,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomText(
+                                  title: "08/09/2025",
+                                  size: 10,
+                                  color: AppColors.primaryBlack,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      height: 25,
+                                      width: 73,
+                                      child: CustomButton(
+                                        buttonTitle: "View Result",
+                                        textColor: AppColors.primaryWhite,
+                                        textWeight: FontWeight.w500,
+                                        textSize: 9.03,
+                                        buttonHeight: 25.04,
+                                        onTap: () {},
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 8,
+                                    ), // spacing between button & icon
+                                    Icon(
+                                      Icons.arrow_drop_down,
+                                      color: AppColors.primaryBlack,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),

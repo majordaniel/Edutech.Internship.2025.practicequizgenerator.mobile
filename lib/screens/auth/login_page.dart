@@ -181,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 10),
                     CustomButton(
-                      buttonTitle: "Login",
+                      buttonTitle: "Sign In",
                       textColor: AppColors.primaryWhite,
                       textWeight: FontWeight.w700,
                       textSize: 20.0,
@@ -194,66 +194,6 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       },
                       alignment: Alignment.center,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                CustomText(
-                  title: "Or continue with",
-                  size: 14,
-                  color: AppColors.primaryDeepBlack,
-                  fontWeight: FontWeight.w500,
-                ),
-                SizedBox(height: 22),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.email, size: 35),
-                    SizedBox(width: 22),
-                    Icon(Icons.facebook, size: 35),
-                    SizedBox(width: 22),
-                    Icon(Icons.apple_rounded, size: 38),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CustomText(
-                      title: "Don’t have an account?",
-                      size: 14,
-                      color: AppColors.primaryDeepBlack,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    SizedBox(width: 4),
-
-                    // CustomText(
-                    //   title: "Register",
-                    //   size: 14,
-                    //   color: Color(0xFFF34068),
-                    //   fontWeight: FontWeight.w500,
-                    // ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: InkWell(
-                        onTap: () {
-                          // Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (context) => const RegisterPage(),
-                          //   ),
-                          // );
-                        },
-                        child: Text(
-                          "Register",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.primaryOrange,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppColors.primaryOrange,
-                          ),
-                        ),
-                      ),
                     ),
                   ],
                 ),

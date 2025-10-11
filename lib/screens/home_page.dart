@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 5.0),
+          padding: EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -77,37 +77,44 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               SizedBox(height: 20.0),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: AppColors.lightOrange,
-                  image: DecorationImage(
-                    image: AssetImage(
-                      "assets/images/baa90d53ce81418c61c575ea58c32b6a6851a879.png",
-                    ), // your image
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    scale: 0.4, // makes it cover the entire screen
+              Stack(
+                children: [
+                  // 1️⃣ Background Image
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: ImageFiltered(
+                      imageFilter: ImageFilter.blur(
+                        sigmaX: 3,
+                        sigmaY: 3,
+                      ), // adjust blur strength
+                      child: Image.asset(
+                        "assets/images/baa90d53ce81418c61c575ea58c32b6a6851a879.png",
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: 181, // or your preferred height
+                      ),
+                    ),
                   ),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 0, 0),
+
+                  // 2️⃣ Foreground Content
+                  Container(
+                    width: double.infinity,
+                    // height: 180, // match the image height
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white.withOpacity(
+                        0.3,
+                      ), // optional overlay tint
+                    ),
+                    padding: EdgeInsets.fromLTRB(16, 16, 0, 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 6.0,
-                            vertical: 6.0,
-                          ),
-                          child: CustomText(
-                            title: "Introducing",
-                            size: 10,
-                            color: AppColors.primaryOrange,
-                            fontWeight: FontWeight.w400,
-                          ),
+                        CustomText(
+                          title: "Introducing",
+                          size: 10,
+                          color: AppColors.primaryOrange,
+                          fontWeight: FontWeight.w400,
                         ),
                         SizedBox(height: 6.0),
                         CustomText(
@@ -124,12 +131,13 @@ class _HomePageState extends State<HomePage> {
                                 'Create a custom quiz and get exam ready with practice questions tailored to you.....',
                             size: 10,
                             color: AppColors.primaryDeepBlack,
-
                             fontWeight: FontWeight.w400,
                           ),
                         ),
+                        // SizedBox(height: 10),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Expanded(
                               child: SizedBox(
@@ -153,18 +161,20 @@ class _HomePageState extends State<HomePage> {
                               child: Image.asset(
                                 'assets/images/online-survey-3d-render-laptop-form-with-ticks 1.png',
                                 fit: BoxFit.cover,
-                                height: 100,
-                                width: 170,
+                                // height: 50,
+                                // width: 70,
                               ),
                             ),
                           ],
                         ),
+                        SizedBox(height: 10),
                       ],
                     ),
                   ),
-                ),
+                ],
               ),
-              SizedBox(height: 10),
+
+              SizedBox(height: 5),
               Row(
                 children: [
                   DashboardCard(
@@ -197,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
 
-              SizedBox(height: 16),
+              SizedBox(height: 10),
               CustomText(
                 title: "Your Activity",
                 size: 16,
@@ -214,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(5.0, 40.0, 5.0, 40.0),
+                      padding: const EdgeInsets.fromLTRB(5.0, 30.0, 5.0, 30.0),
                       child: Column(
                         children: [
                           Container(

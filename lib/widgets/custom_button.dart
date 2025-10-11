@@ -8,9 +8,11 @@ class CustomButton extends StatelessWidget {
   final Color? buttonColor;
   final Color textColor;
   final FontWeight textWeight;
+  final double? buttonWidth;
   final double textSize;
   final double buttonHeight;
   final VoidCallback onTap;
+  final double? borderRadius;
 
   const CustomButton({
     super.key,
@@ -20,7 +22,9 @@ class CustomButton extends StatelessWidget {
     required this.textWeight,
     required this.textSize,
     required this.buttonHeight,
+    this.buttonWidth,
     required this.onTap,
+    this.borderRadius,
     alignment = Alignment.center,
   });
 
@@ -30,10 +34,10 @@ class CustomButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         height: buttonHeight,
-        width: double.infinity,
+        width: buttonWidth,
         decoration: BoxDecoration(
           color: buttonColor ?? AppColors.primaryOrange,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(borderRadius ?? 4.0),
         ),
         alignment: Alignment.center,
         child: CustomText(

@@ -39,8 +39,9 @@ class _LoginPageState extends State<LoginPage> {
             fit: BoxFit.cover, // makes it cover the entire screen
           ),
         ),
+        alignment: Alignment.center,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(40.0, 50.0, 40.0, 30.0),
+          padding: EdgeInsets.symmetric(horizontal: 24.0),
           child: Center(
             child: Column(
               children: [
@@ -184,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                       textColor: AppColors.primaryWhite,
                       textWeight: FontWeight.w700,
                       textSize: 20.0,
-                      buttonHeight: 48.0,
+                      buttonHeight: 44.0,
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(

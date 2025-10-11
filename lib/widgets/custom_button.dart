@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../constant/color.dart';
@@ -22,7 +21,7 @@ class CustomButton extends StatelessWidget {
     required this.textSize,
     required this.buttonHeight,
     required this.onTap,
-    required Alignment alignment,
+    alignment = Alignment.center,
   });
 
   @override

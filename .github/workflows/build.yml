@@ -21,7 +21,6 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: Prepare Android Release Build
       - run: flutter build apk --release
       - name: Upload to release
         uses: actions/upload-release-asset@v1

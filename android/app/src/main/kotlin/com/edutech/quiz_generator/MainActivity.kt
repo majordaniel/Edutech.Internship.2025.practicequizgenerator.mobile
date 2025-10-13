@@ -1,4 +1,4 @@
-package com.example.quiz_generator
+package com.edutech.quiz_generator
 
 import io.flutter.embedding.android.FlutterActivity
 

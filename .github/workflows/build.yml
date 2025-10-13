@@ -36,7 +36,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: Build release package: ${{ env.app_name }}
+      - name: Build release package: {{ env.app_name }}
         run: |
           flutter build apk --release
           cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}

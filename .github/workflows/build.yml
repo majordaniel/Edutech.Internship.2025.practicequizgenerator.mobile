@@ -52,6 +52,5 @@ jobs:
           name: "a release: ${{ env.app_name }}"
           draft: true
           body_path: RELEASE.txt
-            This is seriously acting -- Sia noooo
           files: |
             build/${{ env.app_name }}

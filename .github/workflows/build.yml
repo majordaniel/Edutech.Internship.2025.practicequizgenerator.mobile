@@ -22,7 +22,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'zulu'
 
-      - name: Install Android NDK r23c
+      - name: Install Android NDK r27
         uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:

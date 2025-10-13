@@ -26,6 +26,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: edutech-quizgenerator.apk
+          tag_name: edutech-quizgenerator.apk
           draft: true
           body: |
             This is seriously acting -- Sia noooo

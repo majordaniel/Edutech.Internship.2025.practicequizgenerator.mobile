@@ -24,10 +24,12 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - run: flutter build apk --release
+      - run: |
+          flutter build apk --release
+          cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
+
       - name: Upload to release
         uses: softprops/action-gh-release@v2
-        run: cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
         with:
           name: A release ${{ env.app_name }}
           draft: true

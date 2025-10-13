@@ -1,5 +1,8 @@
 name: Confirm Build
 
+env:
+  app_name: edutech-quizgenerator.apk
+
 on:
   push:
     branches:
@@ -24,11 +27,11 @@ jobs:
       - run: flutter build apk --release
       - name: Upload to release
         uses: softprops/action-gh-release@v2
+        run: cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
         with:
-          name: edutech-quizgenerator.apk
-          tag_name: edutech-quizgenerator.apk
+          name: A release ${{ env.app_name }}
           draft: true
           body: |
             This is seriously acting -- Sia noooo
           files: |
-            build/app/outputs/apk/release/app-release.apk
+            build/${{ env.app_name }}

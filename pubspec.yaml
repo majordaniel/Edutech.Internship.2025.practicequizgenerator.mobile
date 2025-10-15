@@ -1,8 +1,8 @@
 name: quiz_generator
-description: "A new Flutter project."
+description: "EduTech Quiz Generator app"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 0.1.1
 
 environment:
   sdk: ^3.9.2
@@ -10,25 +10,32 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.3.2
   flutter_svg: ^2.2.1
-  dropdown_button2: ^2.3.9
+  google_fonts: ^6.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.4
 
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path: "assets/favicon/Exam Portal Logo.png"
-
 flutter:
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-VariableFont_opsz_wght.ttf
+        - asset: assets/fonts/Inter-Italic-VariableFont_opsz_wght.ttf
+          style: italic
+    - family: PlusJakartaSans
+      fonts:
+      - asset: assets/fonts/PlusJakartaSans-VariableFont_wght.ttf
+      - asset: assets/fonts/PlusJakartaSans-Italic-VariableFont_wght.ttf
+        style: italic
+
   uses-material-design: true
   assets:
     - assets/favicon/
     - assets/icons/
-    - assets/images/

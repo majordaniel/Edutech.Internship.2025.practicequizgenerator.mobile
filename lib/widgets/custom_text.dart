@@ -19,7 +19,6 @@ class CustomText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      textAlign: TextAlign.start,
       style: GoogleFonts.inter(
         textStyle: Theme.of(context).textTheme.displayLarge,
         fontSize: size,

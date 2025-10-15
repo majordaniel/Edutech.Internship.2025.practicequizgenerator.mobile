@@ -12,7 +12,7 @@ class CustomText extends StatelessWidget {
     required this.title,
     required this.size,
     required this.color,
-    required this.fontWeight,
+    required this.fontWeight, 
   });
 
   @override

@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               children: [
                 Image.asset(
-                  'assets/images/Exam Portal Logo.png',
+                  'assets/favicon/Exam Portal Logo.png',
                   height: 201,
                   width: 204,
                 ),

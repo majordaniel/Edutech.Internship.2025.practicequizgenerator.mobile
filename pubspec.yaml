@@ -26,10 +26,11 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/Exam Portal Logo.png"
+  image_path: "assets/favicon/Exam Portal Logo.png"
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/
+    - assets/favicon/
     - assets/icons/
+    - assets/images/

@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Flutter App on iOS Simulator",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "ios",
+      "flutterMode": "debug"
+    }
+  ]
+}

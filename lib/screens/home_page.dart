@@ -240,7 +240,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             child: ImageIcon(
                               AssetImage(
-                                'assets/images/learning-tools_18843128 1.png',
+                                'assets/icons/learning-tools_18843128 1.png',
                               ),
                               size: 35.22,
                               color: AppColors.primaryDeepBlack,

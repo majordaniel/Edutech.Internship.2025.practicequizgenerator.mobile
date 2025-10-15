@@ -1,0 +1,56 @@
+name: Confirm Build
+
+env:
+  app_name: edutech-quizgenerator.apk
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  
+jobs:
+  build_apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: cat .github/workflows/versions.env >> $GITHUB_ENV
+
+      - name: Install Java SDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'zulu'
+
+      - name: Install Android NDK r27
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r27
+          link-to-sdk: true
+          local-cache: true
+
+      - name: Install Flutter and Dart SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: "Build release package ${{ env.app_name }}"
+        run: |
+          flutter build apk --release
+          cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+      - name: Generate RELEASE.txt
+        run: |
+          echo "A release of ${{ env.app_name }} on $(date)" > RELEASE.txt
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "a release: ${{ env.app_name }}"
+          draft: true
+          body_path: RELEASE.txt
+          files: |
+            build/${{ env.app_name }}

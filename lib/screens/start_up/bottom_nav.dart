@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_generator/screens/Signout_page.dart';
+import 'package:quiz_generator/screens/signout_page.dart';
 import 'package:quiz_generator/screens/mock_exam.dart';
 
 import '../../constant/color.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CustomText extends StatelessWidget {
   final String title;
@@ -19,8 +18,8 @@ class CustomText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: GoogleFonts.inter(
-        textStyle: Theme.of(context).textTheme.displayLarge,
+      style: TextStyle(
+        fontFamily: 'Inter',
         fontSize: size,
         fontWeight: fontWeight,
         color: color,

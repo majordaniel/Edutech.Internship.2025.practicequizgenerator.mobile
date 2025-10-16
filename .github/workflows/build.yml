@@ -36,20 +36,22 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: "Build release package ${{ env.app_name }}"
+      - name: "Build release package"
         run: |
           flutter build apk --release
-          cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
-      - name: Generate RELEASE.txt
+      - name: Prepare the release
         run: |
-          echo "A release of ${{ env.app_name }} on $(date)" > RELEASE.txt
+          cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
+          echo Renamed
+          echo "release of ${{ env.app_name }} on $(date)" > RELEASE.txt
+          echo Generated RELEASE.txt
+
       - name: Upload to release
         uses: softprops/action-gh-release@v2
         with:
-          name: "a release: ${{ env.app_name }}"
           draft: true
           body_path: RELEASE.txt
           files: |

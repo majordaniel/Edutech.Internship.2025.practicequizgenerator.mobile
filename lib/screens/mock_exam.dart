@@ -98,13 +98,13 @@ class _MockExamState extends State<MockExam> {
                   children: [
                     DashboardCard(
                       title: "Total Quizzes",
-                      value: "00",
+                      value: "12",
                       iconPath: "assets/icons/Document.png",
                     ),
                     const SizedBox(width: 20),
                     DashboardCard(
                       title: "Average Score",
-                      value: "00",
+                      value: "78%",
                       iconPath: "assets/icons/Document.png",
                     ),
                   ],
@@ -114,13 +114,13 @@ class _MockExamState extends State<MockExam> {
                   children: [
                     DashboardCard(
                       title: "Last Quiz Score",
-                      value: "00",
+                      value: "85%",
                       iconPath: "assets/icons/Document.png",
                     ),
                     const SizedBox(width: 20),
                     DashboardCard(
                       title: "Avg. Performance",
-                      value: "00",
+                      value: "1h:45m",
                       iconPath: "assets/icons/Document.png",
                     ),
                   ],
@@ -146,58 +146,49 @@ class _MockExamState extends State<MockExam> {
                 ),
                 SizedBox(height: 10),
                 QuizResultCard(
-                  quizDetails: "20 Questions | 30 minutes | Quiz Completed",
-                  quizTitle: "Data Science Practice Quiz",
-                  subject: "Computer Science",
-                  score: "75% Correct",
-                  date: "08/09/2025",
-                  onViewResult: () {
-                    // Navigate to result page or show dialog
-                  },
-                  onExpand: () {
-                    // Handle dropdown action if needed
+                  quizTitle: "Math Practice",
+                  subject: "Mathematics",
+                  quizDetails: "20 Questions • 30 minutes • Completed",
+                  progress: 0.8,
+                  date: "Oct 16, 2025",
+                  onSelectAction: (action) {
+                    print("User selected: $action");
                   },
                 ),
+
                 SizedBox(height: 10),
                 QuizResultCard(
-                  quizDetails: "20 Questions | 30 minutes | Quiz Completed",
-                  quizTitle: "Data Science Practice Quiz",
-                  subject: "Computer Science",
-                  score: "75% Correct",
-                  date: "08/09/2025",
-                  onViewResult: () {
-                    // Navigate to result page or show dialog
-                  },
-                  onExpand: () {
-                    // Handle dropdown action if needed
+                  quizTitle: "Math Practice",
+                  subject: "Mathematics",
+                  quizDetails: "20 Questions • 30 minutes • Completed",
+                  progress: 0.8,
+                  date: "Oct 16, 2025",
+                  onSelectAction: (action) {
+                    print("User selected: $action");
                   },
                 ),
+
                 SizedBox(height: 10),
                 QuizResultCard(
-                  quizDetails: "20 Questions | 30 minutes | Quiz Completed",
-                  quizTitle: "Data Science Practice Quiz",
-                  subject: "Computer Science",
-                  score: "75% Correct",
-                  date: "08/09/2025",
-                  onViewResult: () {
-                    // Navigate to result page or show dialog
-                  },
-                  onExpand: () {
-                    // Handle dropdown action if needed
+                  quizTitle: "Math Practice",
+                  subject: "Mathematics",
+                  quizDetails: "20 Questions • 30 minutes • Completed",
+                  progress: 0.8,
+                  date: "Oct 16, 2025",
+                  onSelectAction: (action) {
+                    print("User selected: $action");
                   },
                 ),
+
                 SizedBox(height: 10),
                 QuizResultCard(
-                  quizDetails: "20 Questions | 30 minutes | Quiz Completed",
-                  quizTitle: "Data Science Practice Quiz",
-                  subject: "Computer Science",
-                  score: "75% Correct",
-                  date: "08/09/2025",
-                  onViewResult: () {
-                    // Navigate to result page or show dialog
-                  },
-                  onExpand: () {
-                    // Handle dropdown action if needed
+                  quizTitle: "Math Practice",
+                  subject: "Mathematics",
+                  quizDetails: "20 Questions • 30 minutes • Completed",
+                  progress: 0.8,
+                  date: "Oct 16, 2025",
+                  onSelectAction: (action) {
+
                   },
                 ),
               ],

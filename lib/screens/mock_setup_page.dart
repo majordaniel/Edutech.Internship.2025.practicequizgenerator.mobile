@@ -54,13 +54,10 @@ class _MockSetupPageState extends State<MockSetupPage> {
                               size: 20,
                             ),
                             onPressed: () {
-                              Navigator.pop(
-                                context,
-                              ); // Go back to the previous screen
+                              Navigator.pop(context);
                             },
                           ),
                           const SizedBox(width: 5),
-
                           const Spacer(),
                           Icon(
                             Icons.notifications_none,
@@ -87,56 +84,72 @@ class _MockSetupPageState extends State<MockSetupPage> {
                             buttonWidth: 73.9,
                             borderRadius: 12.06,
                             onTap: () async {
-                              // Show first dialog
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,
-                                builder: (context) => const CustomDialog(
-                                  icon: Icons.check_circle_outline,
-                                  title: "Generating Mock Exam Questions",
-                                  message: "Loading.........",
-                                  iconPath: 'assets/icons/Edit Square.png',
-                                ),
-                              );
+                                builder: (context) {
+                                  bool isLoading = true;
 
-                              // Wait 2 seconds safely
-                              await Future.delayed(const Duration(seconds: 2));
+                                  // Use StatefulBuilder to control dialog rebuilds
+                                  return StatefulBuilder(
+                                    builder: (context, setState) {
+                                      // Run the delay only once
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                            Future.delayed(
+                                              const Duration(seconds: 2),
+                                              () {
+                                                if (context.mounted) {
+                                                  setState(() {
+                                                    isLoading = false;
+                                                  });
+                                                }
+                                              },
+                                            );
+                                          });
 
-                              // ✅ Check if widget is still mounted before using context
-                              if (!mounted) return;
-
-                              // Close the first dialog
-                              Navigator.pop(context);
-
-                              // ✅ Show second dialog safely
-                              if (!mounted) return;
-
-                              showDialog(
-                                context: context,
-                                builder: (context) => CustomDialog(
-                                  icon: Icons.check_circle_outline,
-                                  iconPath: 'assets/icons/Success.png',
-                                  title: "Mock Quiz Successfully Configured",
-                                  message:
-                                      "Your mock quiz has been successfully set up. You can review your selections or start the quiz now.",
-                                  secondaryButtonText: "Review Selections",
-                                  primaryButtonText: "Start Quiz",
-                                  primaryButtonColor: AppColors.primaryOrange,
-                                  primaryBorderColor: AppColors.primaryOrange,
-                                  secondaryBorderColor: AppColors.primaryOrange,
-                                  onSecondaryPressed: () {
-                                    Navigator.pop(context);
-                                    // Navigate to review screen or stay on this page
-                                  },
-                                  onPrimaryPressed: () {
-                                    Navigator.pop(context);
-                                    // Navigate to the quiz page
-                                  },
-                                ),
+                                      // Return appropriate dialog state
+                                      return isLoading
+                                          ? const CustomDialog(
+                                              icon: Icons.hourglass_empty,
+                                              iconPath:
+                                                  'assets/icons/Edit Square.png',
+                                              title:
+                                                  "Generating Mock Exam Questions",
+                                              message: "Loading.........",
+                                            )
+                                          : CustomDialog(
+                                              icon: Icons.check_circle_outline,
+                                              iconPath:
+                                                  'assets/icons/Success.png',
+                                              title:
+                                                  "Mock Quiz Successfully Configured",
+                                              message:
+                                                  "Your mock quiz has been successfully set up. You can review your selections or start the quiz now.",
+                                              secondaryButtonText:
+                                                  "Review Selections",
+                                              primaryButtonText: "Start Quiz",
+                                              primaryButtonColor:
+                                                  AppColors.primaryOrange,
+                                              primaryBorderColor:
+                                                  AppColors.primaryOrange,
+                                              secondaryBorderColor:
+                                                  AppColors.primaryOrange,
+                                              onSecondaryPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              onPrimaryPressed: () {
+                                                Navigator.pop(context);
+                                                // Navigator.pushNamed(context, '/quiz');
+                                              },
+                                            );
+                                    },
+                                  );
+                                },
                               );
                             },
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           CustomText(
                             title: "Computer Science",
                             size: 14,
@@ -145,18 +158,18 @@ class _MockSetupPageState extends State<MockSetupPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       CustomText(
                         title: "Select Course",
                         size: 14,
                         color: AppColors.primaryDeepBlack,
                         fontWeight: FontWeight.w600,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       DropdownButtonFormField(
                         dropdownColor: AppColors.primaryWhite,
-                        initialValue: selectedValue,
-                        icon: Icon(Icons.keyboard_arrow_down),
+                        value: selectedValue,
+                        icon: const Icon(Icons.keyboard_arrow_down),
                         items: items
                             .map(
                               (method) => DropdownMenuItem(
@@ -184,14 +197,14 @@ class _MockSetupPageState extends State<MockSetupPage> {
                           fillColor: Colors.transparent,
                         ),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       CustomText(
                         title: "Question Type",
                         size: 14,
                         color: AppColors.primaryDeepBlack,
                         fontWeight: FontWeight.w600,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       QuestionTypeSelector(
                         title: "Multiple Choice Questions",
                         subtitle: "Quick Selection questions",
@@ -227,45 +240,45 @@ class _MockSetupPageState extends State<MockSetupPage> {
                           });
                         },
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       CustomText(
                         title: "Number of Questions",
                         size: 14,
                         color: AppColors.primaryDeepBlack,
                         fontWeight: FontWeight.w600,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       CompactNumberSpinner(
                         initialValue: 0,
                         onChanged: (val) {},
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       CustomText(
                         title: "Minimum 5, Maximum 50 questions",
                         size: 10,
                         color: AppColors.primaryDeepGrey,
                         fontWeight: FontWeight.w500,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       CustomText(
                         title: "Timer",
                         size: 14,
                         color: AppColors.primaryDeepBlack,
                         fontWeight: FontWeight.w600,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       CompactNumberSpinner(
                         initialValue: 0,
                         onChanged: (val) {},
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       CustomText(
                         title: "30 minutes to 2 hours",
                         size: 10,
                         color: AppColors.primaryDeepGrey,
                         fontWeight: FontWeight.w400,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       QuestionTypeSelector(
                         title: "From Past Exams",
                         subtitle:
@@ -279,7 +292,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                           });
                         },
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       QuestionTypeSelector(
                         title: "Upload Course Material",
                         subtitle:

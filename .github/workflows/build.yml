@@ -46,12 +46,15 @@ jobs:
         run: |
           cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
           echo Renamed
-          echo "release of ${{ env.app_name }} on $(date)" > RELEASE.txt
+          d="$(date)"
+          echo "app_version=$d" >> $GITHUB_ENV
+          echo "release of ${{ env.app_name }} on $d" > RELEASE.txt
           echo Generated RELEASE.txt
 
       - name: Upload to release
         uses: softprops/action-gh-release@v2
         with:
+          name: ${{ env.app_name }}-${{ env.app_version }}
           draft: true
           body_path: RELEASE.txt
           files: |

@@ -38,27 +38,21 @@ class _LoginPageState extends State<LoginPage> {
     final password = passwordController.text;
 
     setState(() => loading = true);
-    http
-        .post(
-          Uri.parse('$baseUrl/Auth/login'),
-          headers: {'X-API-Key': api.key},
-          body: {'email': studentId, 'password': password},
-        )
-        .then((r) {
-          final report = r.statusCode == 200
-              ? '"$studentId" logged in successfully'
-              // TODO: handle reasons for login failure
-              : 'error: signing "$studentId" in';
+    api.login(studentId, password).then((r) {
+      final report = r
+          ? '"$studentId" logged in successfully'
+          // TODO: handle reasons for login failure
+          : 'error: signing "$studentId" in';
 
-          print('login/message: $report');
+      print('login/message: $report');
 
-          setState(() => loading = false);
-          if (mounted) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const BottomNavbar()),
-            );
-          }
-        });
+      setState(() => loading = false);
+      if (mounted) {
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const BottomNavbar()));
+      }
+    });
   }
 
   @override

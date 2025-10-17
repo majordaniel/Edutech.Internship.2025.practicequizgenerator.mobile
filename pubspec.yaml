@@ -15,6 +15,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.2.1
   dropdown_button2: ^2.3.9
+  http: ^1.5.0
+  flutter_dotenv: ^6.0.0
+  flutter_riverpod: ^3.0.3
 
 dev_dependencies:
   flutter_test:
@@ -46,3 +49,8 @@ flutter:
     - assets/favicon/
     - assets/icons/
     - assets/images/
+    # flutter_dotenv package requires whichever .env (or any such file) be made an
+    # asset here, so that I will show up in the app's private storage
+    # you can also add .env.<whatnot>, etc, then load it with `dotenv.load('.env.<whatnot>')
+    # DO NOT REMOVE OR YOU RISK BREAKING THE APP LAUNCH
+    - .env

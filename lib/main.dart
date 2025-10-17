@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/start_up/splash_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'api/api.dart';
+
+late final Api postmanApi;
+
+final api =
+    true // env['is_dev'] is String
+    ? postmanApi
+    : throw "Live API is UnImplemented";
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+
+  postmanApi = Api(
+    baseUrl: dotenv.env['MOCK_BASEURL'] as String,
+    apiKey: dotenv.env['MOCK_API_KEY'] as String,
+  );
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -40,8 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body:
-          Center(), 
+      body: Center(),
     );
   }
 }

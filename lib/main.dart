@@ -6,23 +6,27 @@ import 'screens/start_up/splash_screen.dart';
 
 import 'api/api.dart';
 
-late final Api postmanApi;
-
-final api =
-    true // env['is_dev'] is String
-    ? postmanApi
-    : throw "Live API is UnImplemented";
+late final Api api;
 
 final userController = UserController(User('', ''));
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await dotenv.load();
 
-  postmanApi = await Api.init(
-    baseUrl: dotenv.env['MOCK_BASEURL'] as String,
-    apiKey: dotenv.env['MOCK_API_KEY'] as String,
-  );
+  final isStaging = dotenv.env['is_dev'] is String;
+  print('Env: isStaging = $isStaging');
+
+  api = isStaging
+      ? await Api.init(
+          baseUrl: dotenv.env['MOCK_BASEURL'] as String,
+          apiKey: dotenv.env['MOCK_API_KEY'] as String,
+        )
+      : await Api.init(
+          baseUrl: dotenv.env['EDUTECH_SWAGGER_URL'] as String,
+          apiKey: dotenv.env['MOCK_API_KEY'] as String,
+        );
 
   runApp(const ProviderScope(child: MyApp()));
 }

@@ -46,4 +46,3 @@ app.*.map.json
 
 .envrc
 .vscode
-/macos/Flutter/ephemeral

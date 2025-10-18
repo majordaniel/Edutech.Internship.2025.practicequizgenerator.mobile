@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 
 // ...and authenticated
 bool _initialised = false;
 Api? _api;
+
+const loginRequestTimeout = Duration(seconds: 5);
 
 // Unauthenticated API Handle
 // It should be a singleton
@@ -17,7 +22,7 @@ class Api {
     required String apiKey,
   }) async {
     if (_initialised) return _api!;
-    
+
     _initialised = true;
     return Api._(Uri.parse('$baseUrl/api'), apiKey);
   }
@@ -29,10 +34,18 @@ class Api {
           headers: {'X-API-Key': key},
           body: {'email': studentId, 'password': password},
         )
+        .onError<SocketException>((err, StackTrace stk) {
+          print('ApiRequestError: ${err.message}');
+          return http.Response(err.message, _apiRequestErrorCode);
+        })
         .then((r) {
           // TODO: deal with error message
+          if (r.statusCode == _apiRequestErrorCode) {
+            throw ApiRequestError(r.body);
+          }
           return r.statusCode == 200;
-        });
+        })
+        .timeout(loginRequestTimeout, onTimeout: () => throw ApiTimeoutError());
 
     return r;
   }
@@ -51,6 +64,17 @@ class Api {
     return r;
   }
 }
+
+class ApiTimeoutError extends Error {
+  ApiTimeoutError();
+}
+
+class ApiRequestError extends Error {
+  final String message;
+  ApiRequestError(this.message);
+}
+
+const _apiRequestErrorCode = 744;
 
 typedef RegistraionNumber = int;
 typedef LevelCode = String;

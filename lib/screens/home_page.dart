@@ -2,9 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/constant/color.dart';
+import 'package:quiz_generator/main.dart' show userController;
 import 'package:quiz_generator/widgets/custom_button.dart';
 import 'package:quiz_generator/widgets/custom_text.dart';
 import 'package:quiz_generator/widgets/dashboard_card.dart';
+import 'package:quiz_generator/widgets/greeting_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,40 +32,12 @@ class _HomePageState extends State<HomePage> {
                     backgroundImage: AssetImage('assets/images/Ellipse 1.png'),
                   ),
                   SizedBox(width: 10.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Welcome back,",
-                            style: TextStyle(
-                              fontFamily: 'PlusJakartaSans',
-                              fontSize: 14,
-                              color: AppColors.primaryOrange,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          SizedBox(width: 2.0),
-                          Text(
-                            "Monday,",
-                            style: TextStyle(
-                              fontFamily: 'PlusJakartaSans',
-                              fontSize: 14,
-                              color: AppColors.primaryDeepBlack,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 2.0),
-                      CustomText(
-                        title: "ST ID:MAT-0098-23402025",
-                        size: 10,
-                        color: AppColors.primaryLightBlack,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ],
+                  ListenableBuilder(
+                    listenable: userController,
+                    builder: (context, child) {
+                      print('child-type=${child.runtimeType}');
+                      return GreetingCard(user: userController.user);
+                    },
                   ),
                   Spacer(),
                   Icon(

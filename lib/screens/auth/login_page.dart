@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/main.dart';
+import 'package:quiz_generator/models/user.dart';
 import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
 
 import '../../constant/color.dart';
@@ -17,6 +18,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController studentIdController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  bool error = false;
+  String errMsg = '';
+
   bool loading = false;
   bool _rememberMe = false;
 
@@ -33,26 +38,43 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _signinHandler() async {
-    final baseUrl = api.baseUrl;
     final studentId = studentIdController.text;
     final password = passwordController.text;
 
     setState(() => loading = true);
-    api.login(studentId, password).then((r) {
-      final report = r
-          ? '"$studentId" logged in successfully'
-          // TODO: handle reasons for login failure
-          : 'error: signing "$studentId" in';
+    api
+        .login(studentId, password)
+        .onError((e, _) {
+          if (e is ApiRequestError) {
+            print(e.message);
+            error = true;
+            errMsg = 'ApiRequestError: ${e.message}';
+          } else if (e is ApiTimeoutError) {
+            print('ApiTimeoutError: Request timed out');
+            error = true;
+            errMsg = 'Request timed out';
+          }
+          return false;
+        })
+        .then((r) {
+          final report = r
+              ? '"$studentId" logged in successfully'
+              // TODO: handle reasons for login failure
+              : 'error signing "$studentId" in';
 
-      print('login/message: $report');
+          print('login/message: $report');
 
-      setState(() => loading = false);
-      if (mounted) {
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (context) => const BottomNavbar()));
-      }
-    });
+          userController.update(
+            User(studentId, 'ID-${studentId.replaceAll(' ', '-')}'),
+          );
+
+          setState(() => loading = false);
+          if (mounted) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const BottomNavbar()),
+            );
+          }
+        });
   }
 
   @override

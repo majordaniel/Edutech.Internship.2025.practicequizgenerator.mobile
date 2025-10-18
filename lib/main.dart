@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:quiz_generator/models/user.dart';
 import 'screens/start_up/splash_screen.dart';
 
 import 'api/api.dart';
@@ -11,6 +12,8 @@ final api =
     true // env['is_dev'] is String
     ? postmanApi
     : throw "Live API is UnImplemented";
+
+final userController = UserController(User('', ''));
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -28,12 +28,14 @@ class Api {
   }
 
   Future<bool> login(String studentId, String password) async {
+    // TODO: check if network is active before attempting this
     final r = http
         .post(
           Uri.parse('$baseUrl/Auth/login'),
           headers: {'X-API-Key': key},
           body: {'email': studentId, 'password': password},
         )
+        .timeout(loginRequestTimeout, onTimeout: () => throw ApiTimeoutError())
         .onError<SocketException>((err, StackTrace stk) {
           print('ApiRequestError: ${err.message}');
           return http.Response(err.message, _apiRequestErrorCode);
@@ -44,8 +46,7 @@ class Api {
             throw ApiRequestError(r.body);
           }
           return r.statusCode == 200;
-        })
-        .timeout(loginRequestTimeout, onTimeout: () => throw ApiTimeoutError());
+        });
 
     return r;
   }

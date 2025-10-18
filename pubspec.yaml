@@ -8,6 +8,10 @@ environment:
   sdk: ^3.9.2
   flutter: '>=3.29.0 <3.35.5'
 
+platforms:
+  android:
+  ios:
+
 dependencies:
   flutter:
     sdk: flutter
@@ -19,6 +23,8 @@ dependencies:
   flutter_dotenv: ^6.0.0
   flutter_riverpod: ^3.0.3
   riverpod_lint:
+  awesome_dialog: ^3.3.0
+  adaptive_dialog:
 
 dev_dependencies:
   flutter_test:

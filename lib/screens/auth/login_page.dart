@@ -1,12 +1,23 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/main.dart';
 import 'package:quiz_generator/models/user.dart';
 import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
+import 'package:quiz_generator/widgets/greeting_card.dart';
 
 import '../../constant/color.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text.dart';
+
+AwesomeDialog loginFailedDialog(BuildContext context) {
+  return AwesomeDialog(
+    context: context,
+    body: Text('me'), // GreetingCard(user: userController.user),
+    customHeader: Material(),
+  );
+}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,9 +29,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController studentIdController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  bool error = false;
-  String errMsg = '';
 
   bool loading = false;
   bool _rememberMe = false;
@@ -37,39 +45,51 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> _signinHandler() async {
+  Future<void> _signinHandler(BuildContext ctx) async {
     final studentId = studentIdController.text;
     final password = passwordController.text;
+    bool hasError = true;
+    String errMsg = '';
 
     setState(() => loading = true);
     api
         .login(studentId, password)
         .onError((e, _) {
+          // TODO: consider making this a generic 'Network is having a problem. Please try again.'
+          //       apart from failed log in attempt, of course
           if (e is ApiRequestError) {
-            print(e.message);
-            error = true;
-            errMsg = 'ApiRequestError: ${e.message}';
+            errMsg = e.message;
           } else if (e is ApiTimeoutError) {
-            print('ApiTimeoutError: Request timed out');
-            error = true;
             errMsg = 'Request timed out';
           }
           return false;
         })
-        .then((r) {
+        .then((r) async {
+          // clear the loading progress bar since we have the login result now
+          setState(() => loading = false);
+
+          hasError = !r;
           final report = r
               ? '"$studentId" logged in successfully'
-              // TODO: handle reasons for login failure
-              : 'error signing "$studentId" in';
+              : 'error signing "$studentId" in: $errMsg';
 
           print('login/message: $report');
+
+          if (hasError && mounted) {
+            final result = await showOkAlertDialog(
+              context: context,
+              title: 'Sign in',
+              message: errMsg,
+            );
+            print('AlertDialog: $result');
+            return;
+          }
 
           userController.update(
             User(studentId, 'ID-${studentId.replaceAll(' ', '-')}'),
           );
 
-          setState(() => loading = false);
-          if (mounted) {
+          if (!hasError && mounted) {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const BottomNavbar()),
             );
@@ -94,11 +114,11 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.symmetric(horizontal: 24.0),
           child: Stack(
             children: [
-              if (loading)
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (loading)
                       SizedBox(
                         width: 50,
                         height: 50,
@@ -106,10 +126,9 @@ class _LoginPageState extends State<LoginPage> {
                           color: AppColors.primaryDeepBlack,
                         ),
                       ),
-                    ],
-                  ),
+                  ],
                 ),
-
+              ),
               Center(
                 child: Column(
                   children: [
@@ -257,8 +276,8 @@ class _LoginPageState extends State<LoginPage> {
                           textWeight: FontWeight.w700,
                           textSize: 20.0,
                           buttonHeight: 44.0,
-                          onTap: _signinHandler,
                           alignment: Alignment.center,
+                          onTap: () async => _signinHandler(context),
                         ),
                       ],
                     ),

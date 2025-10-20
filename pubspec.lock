@@ -85,10 +85,10 @@ packages:
     dependency: "direct main"
     description:
       name: awesome_dialog
-      sha256: "4c5821a0a637ceee022084e78c1b8237dd4b8bfca4dd24ac2484662a56707338"
+      sha256: "7da175ea284fa5da0a4d0cbdfe835c5b71d30c7b38c1770c0f27f48272ff5a08"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "3.1.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -692,18 +692,18 @@ packages:
     dependency: transitive
     description:
       name: rive
-      sha256: "7fb6efeae1e105d7231cf8fd6ad99ec33369c0c8285d19a299af43acf34065b8"
+      sha256: f2117a96a189758bc79bf7933865625c7a44a420ae537d2a8f6c492900136a71
       url: "https://pub.dev"
     source: hosted
-    version: "0.14.0-dev.11"
-  rive_native:
+    version: "0.11.17"
+  rive_common:
     dependency: transitive
     description:
-      name: rive_native
-      sha256: "9458cbc8e31184b05b1b091030a7ad50c46c8473da54f7e8f197298166c5397e"
+      name: rive_common
+      sha256: e41f12917cb58e0c9376836490ebaa431e12744da0c67e19dad8d4bee9fedd46
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.14"
+    version: "0.2.7"
   riverpod:
     dependency: transitive
     description:

@@ -5,7 +5,6 @@ import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/main.dart';
 import 'package:quiz_generator/models/user.dart';
 import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
-import 'package:quiz_generator/widgets/greeting_card.dart';
 
 import '../../constant/color.dart';
 import '../../widgets/custom_button.dart';

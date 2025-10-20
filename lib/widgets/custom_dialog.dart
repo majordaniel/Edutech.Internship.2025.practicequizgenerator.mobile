@@ -1,157 +1,125 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_generator/constant/color.dart';
-import 'package:quiz_generator/widgets/custom_text.dart';
+import '../constant/color.dart';
+import 'custom_button.dart';
+import 'custom_text.dart';
 
 class CustomDialog extends StatelessWidget {
+  final IconData? icon;
+  final String iconPath;
   final String title;
   final String message;
-  final IconData? icon; // Optional icon (kept for flexibility)
-  final String iconPath; // Path to your asset icon
-  final Color iconBgColor;
-  final Color iconColor;
-
   final String? primaryButtonText;
   final String? secondaryButtonText;
-  final VoidCallback? onPrimaryPressed;
-  final VoidCallback? onSecondaryPressed;
   final Color? primaryButtonColor;
   final Color? primaryBorderColor;
-  final Color? secondaryButtonColor;
   final Color? secondaryBorderColor;
+  final VoidCallback? onPrimaryPressed;
+  final VoidCallback? onSecondaryPressed;
+
+  // ✅ New fields for layout control
+  final EdgeInsetsGeometry? contentPadding;
+  final MainAxisAlignment? buttonAlignment;
 
   const CustomDialog({
     super.key,
+    this.icon,
+    required this.iconPath,
     required this.title,
     required this.message,
-    required this.iconPath,
-    this.icon,
-    this.iconBgColor = const Color(0xFFFEF0EA),
-    this.iconColor = AppColors.primaryOrange,
     this.primaryButtonText,
     this.secondaryButtonText,
-    this.onPrimaryPressed,
-    this.onSecondaryPressed,
     this.primaryButtonColor,
     this.primaryBorderColor,
-    this.secondaryButtonColor,
     this.secondaryBorderColor,
+    this.onPrimaryPressed,
+    this.onSecondaryPressed,
+    this.contentPadding,
+    this.buttonAlignment,
   });
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      backgroundColor: AppColors.primaryWhite,
-      child: SizedBox(
-        width: 330,
-        height: 205,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ✅ Optional icon
-              if (icon != null || iconPath.isNotEmpty) ...[
-                Container(
-                  decoration: BoxDecoration(
-                    color: iconBgColor,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  child: ImageIcon(
-                    AssetImage(iconPath),
-                    size: 53,
-                    color: iconColor,
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Padding(
+        // ✅ Use dynamic content padding
+        padding:
+            contentPadding ??
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Icon
+            if (icon != null)
+              Icon(icon, size: 50, color: AppColors.primaryOrange)
+            else
+              Image.asset(iconPath, height: 50, width: 50, fit: BoxFit.contain),
+            const SizedBox(height: 16),
 
-              // ✅ Title
-              CustomText(
-                title: title,
-                size: 14,
-                color: AppColors.primaryDeepBlack,
-                fontWeight: FontWeight.w700,
-              ),
-              const SizedBox(height: 10),
+            // Title
+            CustomText(
+              title: title,
+              size: 16,
+              color: AppColors.primaryDeepBlack,
+              fontWeight: FontWeight.w700,
+            ),
+            const SizedBox(height: 8),
 
-              // ✅ Message
-              Center(
-                child: CustomText(
-                  title: message,
-                  size: 9,
-                  color: AppColors.primaryDeepGrey,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 20),
+            // Message
+            CustomText(
+              title: message,
+              size: 13,
+              color: AppColors.primaryLightBlack,
+              fontWeight: FontWeight.w500,
+            ),
+            const SizedBox(height: 20),
 
-              // ✅ Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (secondaryButtonText != null)
-                    _buildDialogButton(
-                      context,
-                      text: secondaryButtonText!,
-                      onPressed:
-                          onSecondaryPressed ?? () => Navigator.pop(context),
-                      backgroundColor:
-                          secondaryButtonColor ?? AppColors.primaryWhite,
-                      borderColor:
-                          secondaryBorderColor ?? AppColors.primaryGrey,
-                      textColor: AppColors.primaryLightBlack,
+            // Buttons Row
+            Row(
+              mainAxisAlignment:
+                  buttonAlignment ?? MainAxisAlignment.end, // ✅ New alignment
+              children: [
+                if (secondaryButtonText != null)
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: BoxBorder.all(color: (AppColors.primaryOrange)),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: CustomButton(
+                        buttonTitle: secondaryButtonText!,
+                        onTap: onSecondaryPressed ?? () {},
+
+                        textColor: AppColors.primaryOrange,
+                        buttonColor: Colors.transparent,
+                        buttonHeight: 40,
+                        // borderRadius: 3,
+                        textWeight: FontWeight.w600,
+                        textSize: 12.6,
+                      ),
                     ),
-                  if (secondaryButtonText != null) const SizedBox(width: 10),
-                  if (primaryButtonText != null)
-                    _buildDialogButton(
-                      context,
-                      text: primaryButtonText!,
-                      onPressed:
-                          onPrimaryPressed ?? () => Navigator.pop(context),
-                      backgroundColor:
+                  ),
+                if (secondaryButtonText != null && primaryButtonText != null)
+                  const SizedBox(width: 17),
+                if (primaryButtonText != null)
+                  Expanded(
+                    child: CustomButton(
+                      buttonTitle: primaryButtonText!,
+                      onTap: onPrimaryPressed ?? () {},
+
+                      buttonColor:
                           primaryButtonColor ?? AppColors.primaryOrange,
-                      borderColor:
-                          primaryBorderColor ?? AppColors.primaryOrange,
                       textColor: AppColors.primaryWhite,
+                      buttonHeight: 40,
+                      borderRadius: 3,
+                      textWeight: FontWeight.w600,
+                      textSize: 12.6,
                     ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDialogButton(
-    BuildContext context, {
-    required String text,
-    required VoidCallback onPressed,
-    required Color backgroundColor,
-    required Color borderColor,
-    required Color textColor,
-  }) {
-    return Expanded(
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          elevation: 0,
-          side: BorderSide(color: borderColor, width: 1),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-        ),
-        child: Center(
-          child: CustomText(
-            title: text,
-            size: 14,
-            color: textColor,
-            fontWeight: FontWeight.w600,
-          ),
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/helper/helper.dart';
+import 'package:quiz_generator/screens/quiz_screen.dart';
 import 'package:quiz_generator/widgets/custom_button.dart';
 import 'package:quiz_generator/widgets/custom_text.dart';
 
@@ -90,10 +91,8 @@ class _MockSetupPageState extends State<MockSetupPage> {
                                 builder: (context) {
                                   bool isLoading = true;
 
-                                  // Use StatefulBuilder to control dialog rebuilds
                                   return StatefulBuilder(
                                     builder: (context, setState) {
-                                      // Run the delay only once
                                       WidgetsBinding.instance
                                           .addPostFrameCallback((_) {
                                             Future.delayed(
@@ -108,7 +107,6 @@ class _MockSetupPageState extends State<MockSetupPage> {
                                             );
                                           });
 
-                                      // Return appropriate dialog state
                                       return isLoading
                                           ? const CustomDialog(
                                               icon: Icons.hourglass_empty,
@@ -121,11 +119,11 @@ class _MockSetupPageState extends State<MockSetupPage> {
                                           : CustomDialog(
                                               icon: Icons.check_circle_outline,
                                               iconPath:
-                                                  'assets/icons/Success.png',
+                                                  'assets/icons/Edit Square.png',
                                               title:
                                                   "Mock Quiz Successfully Configured",
                                               message:
-                                                  "Your mock quiz has been successfully set up. You can review your selections or start the quiz now.",
+                                                  "Your Quiz Starts in 09:00 sec",
                                               secondaryButtonText:
                                                   "Review Selections",
                                               primaryButtonText: "Start Quiz",
@@ -135,12 +133,26 @@ class _MockSetupPageState extends State<MockSetupPage> {
                                                   AppColors.primaryOrange,
                                               secondaryBorderColor:
                                                   AppColors.primaryOrange,
+                                              // ✅ Add consistent padding inside the dialog
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 24,
+                                                    vertical: 18,
+                                                  ),
+                                              // ✅ Properly align buttons at the bottom with spacing
+                                              buttonAlignment: MainAxisAlignment
+                                                  .spaceBetween,
                                               onSecondaryPressed: () {
                                                 Navigator.pop(context);
                                               },
                                               onPrimaryPressed: () {
-                                                Navigator.pop(context);
-                                                // Navigator.pushNamed(context, '/quiz');
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        QuizScreen(),
+                                                  ),
+                                                );
                                               },
                                             );
                                     },
@@ -168,7 +180,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       const SizedBox(height: 10),
                       DropdownButtonFormField(
                         dropdownColor: AppColors.primaryWhite,
-                        value: selectedValue,
+                        initialValue: selectedValue,
                         icon: const Icon(Icons.keyboard_arrow_down),
                         items: items
                             .map(

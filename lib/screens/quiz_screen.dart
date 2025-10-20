@@ -86,7 +86,6 @@ class _QuizScreenState extends State<QuizScreen> {
             QuizProgressBar(progress: (currentIndex + 1) / questions.length),
             const SizedBox(height: 24),
 
-            // Question Number
             Text(
               "Question ${currentIndex + 1}",
               style: const TextStyle(
@@ -97,7 +96,6 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
             const SizedBox(height: 10),
 
-            // ✅ Custom Question Card
             QuestionCard(
               question: question['question'],
               options: List<String>.from(question['options']),
@@ -117,73 +115,81 @@ class _QuizScreenState extends State<QuizScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (currentIndex > 0)
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        currentIndex--;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryLightBlack,
+  ElevatedButton(
+    onPressed: () {
+      setState(() {
+        currentIndex--;
+      });
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: AppColors.primaryLightBlack,
+      foregroundColor: AppColors.primaryWhite,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 14,
+      ),
+    ),
+    child: const Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+
+        Icon(Icons.arrow_back_ios_new, size: 18),
+        SizedBox(width: 6),
+        Text(
+          "Prev",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
+      ],
+    ),
+  ),
+
+
+                ElevatedButton(
+                   style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryOrange,
                       foregroundColor: AppColors.primaryWhite,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 14,
                       ),
                     ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.arrow_back_ios, size: 16),
-                        SizedBox(width: 5),
-                        Text(
-                          "Previous",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
 
-                // ✅ Next or Submit Button
-                ElevatedButton(
                   onPressed: selectedAnswers[currentIndex] != null
                       ? () {
                           if (currentIndex < questions.length - 1) {
                             setState(() {
                               currentIndex++;
-                              selectedOption =
-                                  selectedAnswers[currentIndex];
+                              selectedOption = selectedAnswers[currentIndex];
                             });
                           } else {
-                            // ✅ Submit Quiz Logic
-                            _showSubmitDialog(context);
+                            final answeredCount = selectedAnswers
+                                .where((a) => a != null)
+                                .length;
+                            final unansweredCount =
+                                questions.length - answeredCount;
+                            _showSubmitDialog(
+                              context,
+                              answeredCount,
+                              unansweredCount,
+                            );
                           }
                         }
                       : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOrange,
-                    foregroundColor: AppColors.primaryWhite,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 14,
-                    ),
-                  ),
+
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        currentIndex < questions.length - 1
-                            ? "Next"
-                            : "Submit",
+                        currentIndex < questions.length - 1 ? "Next" : "Submit",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -202,15 +208,15 @@ class _QuizScreenState extends State<QuizScreen> {
               ],
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // ✅ Question Navigator
+            // ✅ Responsive Question Navigator
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.primaryGrey),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 color: AppColors.primaryWhite,
               ),
               child: Column(
@@ -238,7 +244,7 @@ class _QuizScreenState extends State<QuizScreen> {
                               ? AppColors.primaryOrange
                               : Colors.transparent,
                           border: Border.all(color: AppColors.primaryGrey),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           "${index + 1}",
@@ -255,84 +261,196 @@ class _QuizScreenState extends State<QuizScreen> {
                 ],
               ),
             ),
-
-            const SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
 
-  // ✅ Submit confirmation dialog
-  void _showSubmitDialog(BuildContext context) {
+  // ✅ Responsive Submit Dialog
+  void _showSubmitDialog(BuildContext context, int answered, int unanswered) {
+    final answered = selectedAnswers.where((a) => a != null).length;
+    final unanswered = questions.length - answered;
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: const Text(
-          "Submit Quiz?",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryDeepBlack,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 🔶 Icon
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFE9D6),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.edit_outlined,
+                  color: Color(0xFFFF7A00),
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // 📝 Title
+              const Text(
+                "Confirm Submission",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF2E2E2E),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ✅ Answered Questions
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Answered Questions: $answered",
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 10,
+                    ),
+                  ),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFFF7A00)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      // TODO: Jump to answered questions screen
+                    },
+                    child: const Text(
+                      "Review Question",
+                      style: TextStyle(
+                        color: Color(0xFFFF7A00),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // ❌ Unanswered Questions
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Unanswered Questions: $unanswered",
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 10,
+                    ),
+                  ),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFFFF7A00)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      // TODO: Jump to unanswered questions screen
+                    },
+                    child: const Text(
+                      "Review Question",
+                      style: TextStyle(
+                        color: Color(0xFFFF7A00),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              // 🟧 Submit Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _showResultDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF7A00),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text(
+                    "Submit",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        content: const Text(
-          "Are you sure you want to submit your answers?",
-          style: TextStyle(color: AppColors.primaryDeepBlack),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              "Cancel",
-              style: TextStyle(color: AppColors.primaryLightBlack),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              _showResultDialog(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryOrange,
-              foregroundColor: AppColors.primaryWhite,
-            ),
-            child: const Text("Submit"),
-          ),
-        ],
       ),
     );
   }
 
-  // ✅ Mock result dialog (after submission)
   void _showResultDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
           "Quiz Submitted!",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: AppColors.primaryDeepBlack,
+            color: Color(0xFF2E2E2E),
           ),
         ),
         content: const Text(
           "Your responses have been recorded successfully.",
-          style: TextStyle(color: AppColors.primaryDeepBlack),
+          style: TextStyle(color: Color(0xFF2E2E2E)),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              "Close",
-              style: TextStyle(color: AppColors.primaryOrange),
-            ),
-          ),
+          ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    // _showResultDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF7A00),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text(
+                    "Close",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ),
         ],
       ),
     );

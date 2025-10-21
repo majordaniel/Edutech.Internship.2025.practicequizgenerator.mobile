@@ -18,16 +18,14 @@ class MockSetupPage extends StatefulWidget {
 
 class _MockSetupPageState extends State<MockSetupPage> {
   final List<String> items = [
-    'Item1',
-    'Item2',
-    'Item3',
-    'Item4',
-    'Item5',
-    'Item6',
-    'Item7',
-    'Item8',
+    'Computer Science',
+    'Discrete Mathematics',
+    'Linear Algebra',
+    'Information Technology',
+    'Algorithm Design',
   ];
 
+  int seconds = 0, minutes = 5;
   String? selectedValue;
   String selectedType = 'mcq';
 
@@ -85,80 +83,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                             buttonWidth: 73.9,
                             borderRadius: 12.06,
                             onTap: () async {
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) {
-                                  bool isLoading = true;
-
-                                  return StatefulBuilder(
-                                    builder: (context, setState) {
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) {
-                                            Future.delayed(
-                                              const Duration(seconds: 2),
-                                              () {
-                                                if (context.mounted) {
-                                                  setState(() {
-                                                    isLoading = false;
-                                                  });
-                                                }
-                                              },
-                                            );
-                                          });
-
-                                      return isLoading
-                                          ? const CustomDialog(
-                                              icon: Icons.hourglass_empty,
-                                              iconPath:
-                                                  'assets/icons/Edit Square.png',
-                                              title:
-                                                  "Generating Mock Exam Questions",
-                                              message: "Loading.........",
-                                            )
-                                          : CustomDialog(
-                                              icon: Icons.check_circle_outline,
-                                              iconPath:
-                                                  'assets/icons/Edit Square.png',
-                                              title:
-                                                  "Mock Quiz Successfully Configured",
-                                              message:
-                                                  "Your Quiz Starts in 09:00 sec",
-                                              secondaryButtonText:
-                                                  "Review Selections",
-                                              primaryButtonText: "Start Quiz",
-                                              primaryButtonColor:
-                                                  AppColors.primaryOrange,
-                                              primaryBorderColor:
-                                                  AppColors.primaryOrange,
-                                              secondaryBorderColor:
-                                                  AppColors.primaryOrange,
-                                              // ✅ Add consistent padding inside the dialog
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 24,
-                                                    vertical: 18,
-                                                  ),
-                                              // ✅ Properly align buttons at the bottom with spacing
-                                              buttonAlignment: MainAxisAlignment
-                                                  .spaceBetween,
-                                              onSecondaryPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              onPrimaryPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        QuizScreen(),
-                                                  ),
-                                                );
-                                              },
-                                            );
-                                    },
-                                  );
-                                },
-                              );
+                              _showDialogFn(context);
                             },
                           ),
                           const SizedBox(width: 8),
@@ -210,6 +135,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
+
                       CustomText(
                         title: "Question Type",
                         size: 14,
@@ -253,6 +179,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         },
                       ),
                       const SizedBox(height: 16),
+
                       CustomText(
                         title: "Number of Questions",
                         size: 14,
@@ -260,6 +187,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         fontWeight: FontWeight.w600,
                       ),
                       const SizedBox(height: 8),
+
                       CompactNumberSpinner(
                         initialValue: 0,
                         onChanged: (val) {},
@@ -272,6 +200,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         fontWeight: FontWeight.w500,
                       ),
                       const SizedBox(height: 8),
+
                       CustomText(
                         title: "Timer",
                         size: 14,
@@ -279,16 +208,56 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         fontWeight: FontWeight.w600,
                       ),
                       const SizedBox(height: 8),
-                      CompactNumberSpinner(
-                        initialValue: 0,
-                        onChanged: (val) {},
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(
+                            width: 120,
+                            child: CompactNumberSpinner(
+                              initialValue: minutes,
+                              minValue: 2,
+                              maxValue: 59,
+                              onChanged: (val) {
+                                setState(() {
+                                  minutes = val;
+                                });
+                              },
+                            ),
+                          ),
+                          CustomText(
+                            title: "Minutes",
+                            size: 11,
+                            color: AppColors.primaryDeepBlack,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          SizedBox(
+                            width: 120,
+                            child: CompactNumberSpinner(
+                              initialValue: seconds,
+                              minValue: 0,
+                              maxValue: 59,
+                              onChanged: (val) {
+                                setState(() {
+                                  seconds = val;
+                                });
+                              },
+                            ),
+                          ),
+                          CustomText(
+                            title: "Seconds",
+                            size: 11,
+                            color: AppColors.primaryDeepBlack,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 15),
+
                       CustomText(
-                        title: "30 minutes to 2 hours",
-                        size: 10,
-                        color: AppColors.primaryDeepGrey,
-                        fontWeight: FontWeight.w400,
+                        title: "Generate from:",
+                        size: 14,
+                        color: AppColors.primaryDeepBlack,
+                        fontWeight: FontWeight.w600,
                       ),
                       const SizedBox(height: 8),
                       QuestionTypeSelector(
@@ -324,6 +293,74 @@ class _MockSetupPageState extends State<MockSetupPage> {
           },
         ),
       ),
+    );
+  }
+
+  Future<dynamic> _showDialogFn(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        bool isLoading = true;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Future.delayed(const Duration(seconds: 2), () {
+                if (context.mounted) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }
+              });
+            });
+
+            return isLoading
+                ? const CustomDialog(
+                    icon: Icons.hourglass_empty,
+                    iconPath: 'assets/icons/Edit Square.png',
+                    title: "Generating Mock Exam Questions",
+                    message: "Loading.........",
+                  )
+                : CustomDialog(
+                    icon: Icons.check_circle_outline,
+                    iconPath: 'assets/icons/Edit Square.png',
+                    title: "Mock Quiz Successfully Configured",
+                    message: "Your Quiz Starts in 09:00 sec",
+                    secondaryButtonText: "Review Selections",
+                    primaryButtonText: "Start Quiz",
+                    primaryButtonColor: AppColors.primaryOrange,
+                    primaryBorderColor: AppColors.primaryOrange,
+                    secondaryBorderColor: AppColors.primaryOrange,
+                    // ✅ Add consistent padding inside the dialog
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 18,
+                    ),
+                    // ✅ Properly align buttons at the bottom with spacing
+                    buttonAlignment: MainAxisAlignment.spaceBetween,
+                    onSecondaryPressed: () {
+                      Navigator.pop(context);
+                    },
+                    onPrimaryPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return QuizScreen(
+                              duration: Duration(
+                                minutes: minutes,
+                                seconds: seconds,
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
+          },
+        );
+      },
     );
   }
 }

@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../constant/color.dart';
 import '../widgets/quiz_progress_bar.dart';
 import '../widgets/question_card.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+  Duration duration;
+  DateTime now;
+  QuizScreen({super.key, required this.duration}) : now = DateTime.now();
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -14,6 +18,8 @@ class _QuizScreenState extends State<QuizScreen> {
   int currentIndex = 0;
   int? selectedOption;
   late List<int?> selectedAnswers;
+  late Duration remainingTime;
+  late Timer timer;
 
   final List<Map<String, dynamic>> questions = [
     {
@@ -40,11 +46,35 @@ class _QuizScreenState extends State<QuizScreen> {
   void initState() {
     super.initState();
     selectedAnswers = List<int?>.filled(questions.length, null);
+    remainingTime = widget.duration;
+    timer = Timer.periodic(Duration(seconds: 1), (t) {
+      if (t.tick == widget.duration.inSeconds) {
+        // time up!
+        print('time up!');
+        t.cancel();
+      }
+      setState(() {
+        remainingTime = Duration(
+          seconds: widget.duration.inSeconds - t.tick,
+          // 1 /* to account for zero start of t.tick */,
+        );
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timer.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     final question = questions[currentIndex];
+    final rs = remainingTime.inSeconds % 60,
+        remSeconds = rs < 10 ? '0$rs' : rs,
+        rm = remainingTime.inMinutes,
+        remMinutes = rm < 10 ? '0$rm' : rm;
 
     return Scaffold(
       backgroundColor: AppColors.primaryWhite,
@@ -59,15 +89,15 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
         ),
         centerTitle: false,
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16),
+            padding: EdgeInsets.only(right: 10),
             child: Row(
               children: [
                 Icon(Icons.timer_outlined, color: AppColors.primaryDeepBlack),
                 SizedBox(width: 6),
                 Text(
-                  "04:45",
+                  '$remMinutes:$remSeconds',
                   style: TextStyle(
                     color: AppColors.primaryDeepBlack,
                     fontWeight: FontWeight.w600,
@@ -115,53 +145,51 @@ class _QuizScreenState extends State<QuizScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (currentIndex > 0)
-  ElevatedButton(
-    onPressed: () {
-      setState(() {
-        currentIndex--;
-      });
-    },
-    style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.primaryLightBlack,
-      foregroundColor: AppColors.primaryWhite,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6),
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 14,
-      ),
-    ),
-    child: const Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-
-        Icon(Icons.arrow_back_ios_new, size: 18),
-        SizedBox(width: 6),
-        Text(
-          "Prev",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-        ),
-      ],
-    ),
-  ),
-
-
-                ElevatedButton(
-                   style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOrange,
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        currentIndex--;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryLightBlack,
                       foregroundColor: AppColors.primaryWhite,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
+                        horizontal: 20,
                         vertical: 14,
                       ),
                     ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.arrow_back_ios_new, size: 18),
+                        SizedBox(width: 6),
+                        Text(
+                          "Prev",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryOrange,
+                    foregroundColor: AppColors.primaryWhite,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                  ),
 
                   onPressed: selectedAnswers[currentIndex] != null
                       ? () {
@@ -434,23 +462,23 @@ class _QuizScreenState extends State<QuizScreen> {
         ),
         actions: [
           ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    // _showResultDialog(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF7A00),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: const Text(
-                    "Close",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                ),
+            onPressed: () {
+              Navigator.pop(ctx);
+              // _showResultDialog(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF7A00),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            child: const Text(
+              "Close",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+          ),
         ],
       ),
     );

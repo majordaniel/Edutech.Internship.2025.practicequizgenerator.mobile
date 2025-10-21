@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:quiz_generator/screens/mock_setup_page.dart';
 import '../constant/color.dart';
 import '../widgets/quiz_progress_bar.dart';
 import '../widgets/question_card.dart';
@@ -464,7 +465,10 @@ class _QuizScreenState extends State<QuizScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              // _showResultDialog(context);
+              Navigator.push(
+                ctx,
+                MaterialPageRoute(builder: (context) => MockSetupPage()),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF7A00),

@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 bool _initialised = false;
 Api? _api;
 
-const loginRequestTimeout = Duration(seconds: 5);
+const loginRequestTimeout = Duration(seconds: 10);
 
 // Unauthenticated API Handle
 // It should be a singleton

@@ -1,5 +1,4 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/main.dart';
@@ -9,14 +8,6 @@ import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
 import '../../constant/color.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text.dart';
-
-AwesomeDialog loginFailedDialog(BuildContext context) {
-  return AwesomeDialog(
-    context: context,
-    body: Text('me'), // GreetingCard(user: userController.user),
-    customHeader: Material(),
-  );
-}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

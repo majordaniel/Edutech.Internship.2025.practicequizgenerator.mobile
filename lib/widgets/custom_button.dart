@@ -11,7 +11,7 @@ class CustomButton extends StatelessWidget {
   final double? buttonWidth;
   final double textSize;
   final double buttonHeight;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final double? borderRadius;
 
   const CustomButton({
@@ -23,7 +23,7 @@ class CustomButton extends StatelessWidget {
     required this.textSize,
     required this.buttonHeight,
     this.buttonWidth,
-    required this.onTap,
+    this.onTap,
     this.borderRadius,
     alignment = Alignment.center,
   });

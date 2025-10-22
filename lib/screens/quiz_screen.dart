@@ -1,15 +1,37 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:quiz_generator/models/quiz.dart' show Quiz;
 import 'package:quiz_generator/screens/mock_setup_page.dart';
 import '../constant/color.dart';
 import '../widgets/quiz_progress_bar.dart';
 import '../widgets/question_card.dart';
 
+final List<Map<String, dynamic>> _questions = [
+  {
+    "question":
+        "Which of the following is NOT a characteristic of the parliamentary system of government?",
+    "options": [
+      "Ministers are usually members of parliament",
+      "Prime minister is the head of government",
+      "Ministers are accountable to parliament",
+      "Executive and legislature are separate",
+    ],
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "options": ["Earth", "Mars", "Jupiter", "Saturn"],
+  },
+  {
+    "question": "What is the capital of France?",
+    "options": ["London", "Berlin", "Paris", "Rome"],
+  },
+];
+
 class QuizScreen extends StatefulWidget {
-  Duration duration;
-  DateTime now;
-  QuizScreen({super.key, required this.duration}) : now = DateTime.now();
+  final Duration duration;
+  final Quiz quiz;
+  const QuizScreen({super.key, required this.duration, required this.quiz});
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -21,32 +43,13 @@ class _QuizScreenState extends State<QuizScreen> {
   late List<int?> selectedAnswers;
   late Duration remainingTime;
   late Timer timer;
-
-  final List<Map<String, dynamic>> questions = [
-    {
-      "question":
-          "Which of the following is NOT a characteristic of the parliamentary system of government?",
-      "options": [
-        "Ministers are usually members of parliament",
-        "Prime minister is the head of government",
-        "Ministers are accountable to parliament",
-        "Executive and legislature are separate",
-      ],
-    },
-    {
-      "question": "Which planet is known as the Red Planet?",
-      "options": ["Earth", "Mars", "Jupiter", "Saturn"],
-    },
-    {
-      "question": "What is the capital of France?",
-      "options": ["London", "Berlin", "Paris", "Rome"],
-    },
-  ];
+  late final Quiz quiz;
 
   @override
   void initState() {
     super.initState();
-    selectedAnswers = List<int?>.filled(questions.length, null);
+    quiz = widget.quiz;
+    selectedAnswers = List<int?>.filled(quiz.questions.length, null);
     remainingTime = widget.duration;
     timer = Timer.periodic(Duration(seconds: 1), (t) {
       if (t.tick == widget.duration.inSeconds) {
@@ -71,7 +74,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final question = questions[currentIndex];
+    final question = quiz.questions[currentIndex];
     final rs = remainingTime.inSeconds % 60,
         remSeconds = rs < 10 ? '0$rs' : rs,
         rm = remainingTime.inMinutes,
@@ -114,7 +117,7 @@ class _QuizScreenState extends State<QuizScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            QuizProgressBar(progress: (currentIndex + 1) / questions.length),
+            QuizProgressBar(progress: (currentIndex + 1) / quiz.length),
             const SizedBox(height: 24),
 
             Text(
@@ -128,8 +131,8 @@ class _QuizScreenState extends State<QuizScreen> {
             const SizedBox(height: 10),
 
             QuestionCard(
-              question: question['question'],
-              options: List<String>.from(question['options']),
+              question: question.question,
+              options: List<String>.from(question.options),
               selectedIndex: selectedAnswers[currentIndex],
               onOptionSelected: (index) {
                 setState(() {
@@ -194,7 +197,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
                   onPressed: selectedAnswers[currentIndex] != null
                       ? () {
-                          if (currentIndex < questions.length - 1) {
+                          if (currentIndex < quiz.length - 1) {
                             setState(() {
                               currentIndex++;
                               selectedOption = selectedAnswers[currentIndex];
@@ -203,8 +206,7 @@ class _QuizScreenState extends State<QuizScreen> {
                             final answeredCount = selectedAnswers
                                 .where((a) => a != null)
                                 .length;
-                            final unansweredCount =
-                                questions.length - answeredCount;
+                            final unansweredCount = quiz.length - answeredCount;
                             _showSubmitDialog(
                               context,
                               answeredCount,
@@ -218,7 +220,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        currentIndex < questions.length - 1 ? "Next" : "Submit",
+                        currentIndex < quiz.length - 1 ? "Next" : "Submit",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -226,7 +228,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       ),
                       const SizedBox(width: 5),
                       Icon(
-                        currentIndex < questions.length - 1
+                        currentIndex < quiz.length - 1
                             ? Icons.arrow_forward_ios
                             : Icons.check_circle_outline,
                         size: 16,
@@ -262,7 +264,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
-                    children: List.generate(questions.length, (index) {
+                    children: List.generate(quiz.length, (index) {
                       final isAnswered = selectedAnswers[index] != null;
                       return Container(
                         width: 40,
@@ -299,7 +301,7 @@ class _QuizScreenState extends State<QuizScreen> {
   // ✅ Responsive Submit Dialog
   void _showSubmitDialog(BuildContext context, int answered, int unanswered) {
     final answered = selectedAnswers.where((a) => a != null).length;
-    final unanswered = questions.length - answered;
+    final unanswered = quiz.length - answered;
     showDialog(
       context: context,
       builder: (ctx) => Dialog(

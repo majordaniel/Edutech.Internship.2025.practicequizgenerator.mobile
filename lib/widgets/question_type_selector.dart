@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/widgets/custom_text.dart';
 
+enum QuestionType { mcq, theory, mixed, pastQuestions, aiGenerated }
+
 class QuestionTypeSelector extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String value;
-  final String groupValue;
-  final ValueChanged<String?> onChanged;
+  final QuestionType value;
+  final QuestionType groupValue;
+  final ValueChanged<QuestionType?> onChanged;
   final Widget? icon; // optional static icon
 
   const QuestionTypeSelector({
@@ -42,7 +44,7 @@ class QuestionTypeSelector extends StatelessWidget {
             // Radio with tighter spacing
             Padding(
               padding: const EdgeInsets.only(right: 1.0),
-              child: Radio<String>(
+              child: Radio<QuestionType>(
                 value: value,
                 groupValue: groupValue,
                 onChanged: onChanged,

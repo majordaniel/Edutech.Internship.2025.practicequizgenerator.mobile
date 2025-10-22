@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart' show MediaType;
+import 'package:dio/dio.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/helper/helper.dart';
+import 'package:quiz_generator/main.dart';
+import 'package:quiz_generator/models/quiz.dart';
 import 'package:quiz_generator/screens/quiz_screen.dart';
 import 'package:quiz_generator/widgets/custom_button.dart';
 import 'package:quiz_generator/widgets/custom_text.dart';
@@ -27,7 +33,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
   int seconds = 0, minutes = 5;
   String? selectedValue;
-  String selectedType = 'mcq';
+  QuestionType selectedType = QuestionType.mcq;
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +152,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       QuestionTypeSelector(
                         title: "Multiple Choice Questions",
                         subtitle: "Quick Selection questions",
-                        value: "mcq",
+                        value: QuestionType.mcq,
                         groupValue: selectedType,
                         onChanged: (value) {
                           setState(() {
@@ -158,7 +164,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       QuestionTypeSelector(
                         title: "Theory",
                         subtitle: "Written explanation",
-                        value: "t",
+                        value: QuestionType.theory,
                         groupValue: selectedType,
                         onChanged: (value) {
                           setState(() {
@@ -170,7 +176,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       QuestionTypeSelector(
                         title: "Mixed",
                         subtitle: "Both Types Combined",
-                        value: "m",
+                        value: QuestionType.mixed,
                         groupValue: selectedType,
                         onChanged: (value) {
                           setState(() {
@@ -264,7 +270,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         title: "From Past Exams",
                         subtitle:
                             "Generate Questions from Question Bank database",
-                        value: "fpe",
+                        value: QuestionType.pastQuestions,
                         groupValue: selectedType,
                         icon: Image.asset("assets/icons/Vector.png"),
                         onChanged: (value) {
@@ -278,13 +284,14 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         title: "Upload Course Material",
                         subtitle:
                             "AI Generate questions from your uploaded materials",
-                        value: "upm",
+                        value: QuestionType.aiGenerated,
                         groupValue: selectedType,
                         icon: Image.asset("assets/icons/Group.png"),
                         onChanged: (value) {
                           setState(() => selectedType = value!);
                         },
                       ),
+                      const SizedBox(height: 15),
                     ],
                   ),
                 ),
@@ -296,22 +303,57 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
   }
 
+  Future<Quiz> loadQuiz() async {
+    var baseDirectory = await platformApi.baseDirectory();
+    var t = File('${baseDirectory.path}/Documents/timeout.txt');
+    print('$t exists: ${t.existsSync()}');
+    var n = t.lengthSync();
+
+    final baseOptions = BaseOptions(
+      baseUrl: api.baseUrl.toString(),
+      headers: {'X-API-Key': api.key},
+    );
+    final dio = Dio(baseOptions);
+
+    var dat = FormData.fromMap({
+      'QuestionType': 'Multiple Choice Question',
+      'NumberOfQuestions': 44.toString(),
+      'File': await MultipartFile.fromFile(t.path, filename: 'upload.txt'),
+    });
+
+    // TODO: implement a loading screen for this
+    var response = await dio.post(
+      '/Quiz/generatefromfile',
+      data: dat,
+      queryParameters: Map.fromEntries(dat.fields),
+    );
+
+    var data = response.data['data'] as Map<String, Object?>;
+    if (data case {
+      'qizId': int? quizId,
+      'questions': List<dynamic> questions,
+    }) {
+      var quiz = Quiz.fromList(quizId ?? 0, questions);
+      // print(quiz);
+      return quiz;
+    } else {
+      throw 'Invalid form from server';
+    }
+  }
+
   Future<dynamic> _showDialogFn(BuildContext context) {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         bool isLoading = true;
-
+        Quiz? quiz;
         return StatefulBuilder(
           builder: (context, setState) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Future.delayed(const Duration(seconds: 2), () {
-                if (context.mounted) {
-                  setState(() {
-                    isLoading = false;
-                  });
-                }
+            loadQuiz().then((q) {
+              setState(() {
+                quiz = q;
+                isLoading = false;
               });
             });
 
@@ -342,20 +384,24 @@ class _MockSetupPageState extends State<MockSetupPage> {
                     onSecondaryPressed: () {
                       Navigator.pop(context);
                     },
-                    onPrimaryPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return QuizScreen(
-                              duration: Duration(
-                                minutes: minutes,
-                                seconds: seconds,
-                              ),
-                            );
-                          },
-                        ),
-                      );
+
+                    onPrimaryPressed: () async {
+                      if (mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return QuizScreen(
+                                quiz: quiz!,
+                                duration: Duration(
+                                  minutes: minutes,
+                                  seconds: seconds,
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }
                     },
                   );
           },

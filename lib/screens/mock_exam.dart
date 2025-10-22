@@ -38,7 +38,6 @@ class _MockExamState extends State<MockExam> {
                     ListenableBuilder(
                       listenable: userController,
                       builder: (context, child) {
-                        print('child-type=${child.runtimeType}');
                         return GreetingCard(user: userController.user);
                       },
                     ),

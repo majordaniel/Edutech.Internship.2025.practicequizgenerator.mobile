@@ -79,25 +79,41 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       ),
                       const SizedBox(height: 10),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Row(
+                            children: [
+                              CustomButton(
+                                buttonTitle: "Program",
+                                textColor: AppColors.primaryWhite,
+                                textWeight: FontWeight.w500,
+                                textSize: 12.6,
+                                buttonHeight: 21.3,
+                                buttonWidth: 73.9,
+                                borderRadius: 12.06,
+                              ),
+                              const SizedBox(width: 8),
+                              CustomText(
+                                title: "Computer Science",
+                                size: 14,
+                                color: AppColors.primaryLightBlack,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ],
+                          ),
                           CustomButton(
-                            buttonTitle: "Program",
+                            buttonTitle: "Generate",
+                            buttonColor:  Colors.deepOrange,
                             textColor: AppColors.primaryWhite,
-                            textWeight: FontWeight.w500,
-                            textSize: 12.6,
-                            buttonHeight: 21.3,
-                            buttonWidth: 73.9,
+
+                            textWeight: FontWeight.w900,
+                            textSize: 16,
+                            buttonHeight: 50.3,
+                            buttonWidth: 90,
                             borderRadius: 12.06,
                             onTap: () async {
                               _showDialogFn(context);
                             },
-                          ),
-                          const SizedBox(width: 8),
-                          CustomText(
-                            title: "Computer Science",
-                            size: 14,
-                            color: AppColors.primaryLightBlack,
-                            fontWeight: FontWeight.w500,
                           ),
                         ],
                       ),

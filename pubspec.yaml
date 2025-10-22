@@ -20,10 +20,13 @@ dependencies:
   flutter_svg: ^2.2.1
   dropdown_button2: ^2.3.9
   http: ^1.5.0
+  http_parser: ^4.1.2
   flutter_dotenv: ^6.0.0
   flutter_riverpod: ^3.0.3
-  riverpod_lint:
-  adaptive_dialog:
+  riverpod_lint: ^3.0.3
+  adaptive_dialog: ^2.5.0
+  dio: ^5.9.0
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:

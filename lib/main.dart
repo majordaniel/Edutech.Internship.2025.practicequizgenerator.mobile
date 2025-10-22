@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:quiz_generator/models/user.dart';
+import 'package:quiz_generator/platform_api.dart';
 import 'screens/start_up/splash_screen.dart';
 
 import 'api/api.dart';
@@ -9,6 +11,9 @@ import 'api/api.dart';
 late final Api api;
 
 final userController = UserController(User('', ''));
+final PlatformApi platformApi = Platform.isAndroid
+    ? AndroidApi()
+    : throw "iOS is unimplemented";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:quiz_generator/screens/mock_setup_page.dart';
 import '../../constant/color.dart';
 import '../../widgets/custom_text.dart';
-import '../auth/login_page.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void route() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
+      MaterialPageRoute(builder: (context) => const MockSetupPage()),
     );
   }
 

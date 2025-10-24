@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart'
     show FilePicker, FilePickerResult, FileType;
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:dio/dio.dart';

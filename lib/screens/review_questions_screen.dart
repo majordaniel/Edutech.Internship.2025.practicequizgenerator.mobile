@@ -30,11 +30,9 @@ class _ReviewQuestionsScreenState extends State<ReviewQuestionsScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredQuestions = List.generate(widget.questions.length, (i) => i)
-        .where(
-          (i) => widget.showAnswered
-              ? selectedAnswers[i] != null
-              : selectedAnswers[i] == null,
-        )
+        .where((i) => widget.showAnswered
+            ? selectedAnswers[i] != null
+            : selectedAnswers[i] == null)
         .toList();
 
     return Scaffold(

@@ -117,7 +117,9 @@ class _QuizScreenState extends State<QuizScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            QuizProgressBar(progress: (currentIndex + 1) / quiz.length),
+            QuizProgressBar(
+              progress: selectedAnswers.whereType<int>().length / quiz.length,
+            ),
             const SizedBox(height: 24),
 
             Text(

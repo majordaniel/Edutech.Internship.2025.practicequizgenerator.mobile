@@ -17,6 +17,7 @@ final List<Map<String, dynamic>> _questions = [
       "Ministers are accountable to parliament",
       "Executive and legislature are separate",
     ],
+    "correctOptionIndex": 3,
   },
   {
     "question": "Which planet is known as the Red Planet?",
@@ -25,8 +26,49 @@ final List<Map<String, dynamic>> _questions = [
   {
     "question": "What is the capital of France?",
     "options": ["London", "Berlin", "Paris", "Rome"],
+    "correctOptionIndex": 3,
   },
 ];
+
+class QuestionButton extends StatelessWidget {
+  final int index;
+  final bool isAnswered;
+  final bool isCurrent;
+  final VoidCallback? onTap;
+  const QuestionButton({
+    super.key,
+    required this.index,
+    this.isAnswered = false,
+    this.onTap,
+    this.isCurrent = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox.square(
+          dimension: 40,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: isAnswered ? AppColors.primaryOrange : Colors.transparent,
+              border: Border.all(
+                width: 1.4,
+                color: isCurrent && !isAnswered
+                    ? AppColors.lightOrange
+                    : AppColors.primaryDeepBlack,
+              ),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Center(child: Text(index.toString())),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class QuizScreen extends StatefulWidget {
   final Duration duration;
@@ -263,33 +305,26 @@ class _QuizScreenState extends State<QuizScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: List.generate(quiz.length, (index) {
-                      final isAnswered = selectedAnswers[index] != null;
-                      return Container(
-                        width: 40,
-                        height: 40,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: isAnswered
-                              ? AppColors.primaryOrange
-                              : Colors.transparent,
-                          border: Border.all(color: AppColors.primaryGrey),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          "${index + 1}",
-                          style: TextStyle(
-                            color: isAnswered
-                                ? AppColors.primaryWhite
-                                : AppColors.primaryDeepBlack,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      );
-                    }),
+                  Center(
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: List.generate(quiz.length, (index) {
+                        final isAnswered = selectedAnswers[index] != null;
+                        return QuestionButton(
+                          index: index + 1,
+                          isAnswered: isAnswered,
+                          isCurrent: index == currentIndex,
+                          onTap: () {
+                            if (index != currentIndex) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            }
+                          },
+                        );
+                      }),
+                    ),
                   ),
                 ],
               ),

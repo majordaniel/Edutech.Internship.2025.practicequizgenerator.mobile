@@ -1,9 +1,11 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart' show FilePicker, FilePickerResult;
+import 'package:file_picker/file_picker.dart'
+    show FilePicker, FilePickerResult, FileType;
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:dio/dio.dart';
+import 'package:path/path.dart' as path;
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/helper/helper.dart';
 import 'package:quiz_generator/main.dart';
@@ -116,7 +118,10 @@ class _MockSetupPageState extends State<MockSetupPage> {
                             onTap: () async {
                               FilePickerResult? result = await FilePicker
                                   .platform
-                                  .pickFiles();
+                                  .pickFiles(
+                                    allowedExtensions: ['txt', 'pdf'],
+                                    type: FileType.custom,
+                                  );
                               if (result == null) return;
                               if (context.mounted) {
                                 _generateQuestions(
@@ -337,10 +342,21 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
     final dio = Dio(baseOptions);
 
+    final ext = path.extension(file.path);
+    final mime = switch (ext) {
+      '.txt' => MediaType('text', 'plain'),
+      '.pdf' => MediaType('application', 'pdf'),
+      _ => throw 'Internal Error: $ext',
+    };
+
     var dat = FormData.fromMap({
       'QuestionType': 'Multiple Choice Question',
-      // 'NumberOfQuestions': 44.toString(),
-      'File': await MultipartFile.fromFile(file.path, filename: file.path),
+      'NumberOfQuestions': 44.toString(),
+      'File': await MultipartFile.fromFile(
+        file.path,
+        filename: file.path,
+        contentType: mime,
+      ),
     });
 
     // TODO: implement a loading screen for this

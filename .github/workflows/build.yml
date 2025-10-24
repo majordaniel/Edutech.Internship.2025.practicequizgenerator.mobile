@@ -38,7 +38,7 @@ jobs:
 
       - name: "Build release package"
         run: |
-          echo export MOCK_API_KEY='${{ env.MOCK_API_KEY }}' >> .env
+          echo export MOCK_API_KEY='${{ secrets.MOCK_API_KEY }}' >> .env
           echo export EDUTECH_SWAGGER_URL='${{ env.EDUTECH_SWAGGER_URL }}' >> .env
           flutter build apk --release
         env:

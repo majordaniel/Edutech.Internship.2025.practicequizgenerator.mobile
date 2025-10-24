@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart' show FilePicker, FilePickerResult;
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
@@ -34,6 +35,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
   int seconds = 0, minutes = 5;
   String? selectedValue;
   QuestionType selectedType = QuestionType.mcq;
+  QuestionType generateFrom = QuestionType.aiGenerated;
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +105,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                           ),
                           CustomButton(
                             buttonTitle: "Generate",
-                            buttonColor:  Colors.deepOrange,
+                            buttonColor: Colors.deepOrange,
                             textColor: AppColors.primaryWhite,
 
                             textWeight: FontWeight.w900,
@@ -112,7 +114,16 @@ class _MockSetupPageState extends State<MockSetupPage> {
                             buttonWidth: 90,
                             borderRadius: 12.06,
                             onTap: () async {
-                              _showDialogFn(context);
+                              FilePickerResult? result = await FilePicker
+                                  .platform
+                                  .pickFiles();
+                              if (result == null) return;
+                              if (context.mounted) {
+                                _generateQuestions(
+                                  context,
+                                  File(result.paths[0]!),
+                                );
+                              }
                             },
                           ),
                         ],
@@ -287,11 +298,11 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         subtitle:
                             "Generate Questions from Question Bank database",
                         value: QuestionType.pastQuestions,
-                        groupValue: selectedType,
+                        groupValue: generateFrom,
                         icon: Image.asset("assets/icons/Vector.png"),
                         onChanged: (value) {
                           setState(() {
-                            selectedType = value!;
+                            generateFrom = value!;
                           });
                         },
                       ),
@@ -301,10 +312,10 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         subtitle:
                             "AI Generate questions from your uploaded materials",
                         value: QuestionType.aiGenerated,
-                        groupValue: selectedType,
+                        groupValue: generateFrom,
                         icon: Image.asset("assets/icons/Group.png"),
                         onChanged: (value) {
-                          setState(() => selectedType = value!);
+                          setState(() => generateFrom = value!);
                         },
                       ),
                       const SizedBox(height: 15),
@@ -319,22 +330,17 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
   }
 
-  Future<Quiz> loadQuiz() async {
-    var baseDirectory = await platformApi.baseDirectory();
-    var t = File('${baseDirectory.path}/Documents/timeout.txt');
-    print('$t exists: ${t.existsSync()}');
-    var n = t.lengthSync();
-
+  Future<Quiz> loadQuiz(File file) async {
     final baseOptions = BaseOptions(
       baseUrl: api.baseUrl.toString(),
-      headers: {'X-API-Key': api.key},
+      // headers: {'X-API-Key': api.key},
     );
     final dio = Dio(baseOptions);
 
     var dat = FormData.fromMap({
       'QuestionType': 'Multiple Choice Question',
-      'NumberOfQuestions': 44.toString(),
-      'File': await MultipartFile.fromFile(t.path, filename: 'upload.txt'),
+      // 'NumberOfQuestions': 44.toString(),
+      'File': await MultipartFile.fromFile(file.path, filename: file.path),
     });
 
     // TODO: implement a loading screen for this
@@ -350,14 +356,13 @@ class _MockSetupPageState extends State<MockSetupPage> {
       'questions': List<dynamic> questions,
     }) {
       var quiz = Quiz.fromList(quizId ?? 0, questions);
-      // print(quiz);
       return quiz;
     } else {
       throw 'Invalid form from server';
     }
   }
 
-  Future<dynamic> _showDialogFn(BuildContext context) {
+  Future<dynamic> _generateQuestions(BuildContext context, File file) {
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -366,7 +371,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
         Quiz? quiz;
         return StatefulBuilder(
           builder: (context, setState) {
-            loadQuiz().then((q) {
+            loadQuiz(file).then((q) {
               setState(() {
                 quiz = q;
                 isLoading = false;
@@ -401,7 +406,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       Navigator.pop(context);
                     },
 
-                    onPrimaryPressed: () async {
+                    onPrimaryPressed: () {
                       if (mounted) {
                         Navigator.push(
                           context,

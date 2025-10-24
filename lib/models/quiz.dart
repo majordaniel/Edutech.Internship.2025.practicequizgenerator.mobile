@@ -44,12 +44,13 @@ class Quiz {
             correctIdx: correctOptionIndex,
           ),
         );
+      } else {
+        throw 'Invalid quiz map shape: $quizMap';
       }
     }
 
     return Quiz._(id, qs);
   }
-
 
   @override
   String toString() {

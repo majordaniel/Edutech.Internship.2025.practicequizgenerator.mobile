@@ -6,6 +6,8 @@ env:
 
 on:
   push:
+    tags:
+      - '*'
     branches:
       - main
   workflow_dispatch:
@@ -14,6 +16,11 @@ jobs:
   build_apk:
     runs-on: ubuntu-latest
     steps:
+      - name: Ref name
+        run: |
+          echo "Ref name: ${{ github.ref_name }}"
+          echo "Ref type: ${{ github.ref_type }}"
+
       - uses: actions/checkout@v5
       - run: cat .github/workflows/versions.env >> $GITHUB_ENV
 
@@ -52,8 +59,7 @@ jobs:
         run: |
           cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
           echo Renamed
-          d="$(date)"
-          echo "app_version=$d" >> $GITHUB_ENV
+          echo "app_version=${{ github.ref_name }}" >> $GITHUB_ENV
           echo "release of ${{ env.app_name }} on $d" > RELEASE.txt
           echo Generated RELEASE.txt
 
@@ -66,5 +72,6 @@ jobs:
           body_path: RELEASE.txt
           overwrite_files: false
           make_latest: true
+          generate_release_notes: true
           files: |
             build/${{ env.app_name }}

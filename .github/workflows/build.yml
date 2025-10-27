@@ -48,6 +48,7 @@ jobs:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
       - name: Prepare the release
+        if: github.ref_type == 'tag'
         run: |
           cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
           echo Renamed
@@ -58,10 +59,12 @@ jobs:
 
       - name: Upload to release
         uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
         with:
           name: ${{ env.app_name }}-${{ env.app_version }}
-          draft: true
+          draft: false
           body_path: RELEASE.txt
           overwrite_files: false
+          make_latest: true
           files: |
             build/${{ env.app_name }}

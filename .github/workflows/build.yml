@@ -1,10 +1,13 @@
 name: Confirm Build
 
 env:
-  app_name: edutech-quizgenerator.apk
+  app_name: edutech-quizgenerator
+  API_URL: http://apppracticequiz.runasp.net
 
 on:
   push:
+    tags:
+      - '*'
     branches:
       - main
   workflow_dispatch:
@@ -38,26 +41,31 @@ jobs:
 
       - name: "Build release package"
         run: |
-          echo export MOCK_API_KEY='${{ secrets.MOCK_API_KEY }}' >> .env
-          echo export EDUTECH_SWAGGER_URL='${{ vars.EDUTECH_SWAGGER_URL }}' >> .env
+          echo export MOCK_API_KEY=$API_KEY >> .env
+          echo export EDUTECH_SWAGGER_URL=$API_URL >> .env
           flutter build apk --release
         env:
+          API_KEY: ${{ secrets.API_KEY }}
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
       - name: Prepare the release
+        if: github.ref_type == 'tag'
         run: |
-          cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}
+          cp build/app/outputs/apk/release/app-release.apk build/${{ env.app_name }}.apk
           echo Renamed
-          d="$(date)"
-          echo "app_version=$d" >> $GITHUB_ENV
-          echo "release of ${{ env.app_name }} on $d" > RELEASE.txt
+          echo "app_version=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "Release ${{ env.app_name }}-${{ github.ref_name }}.apk on $(date)" > RELEASE.txt
           echo Generated RELEASE.txt
 
       - name: Upload to release
         uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
         with:
-          name: ${{ env.app_name }}-${{ env.app_version }}
-          draft: true
+          name: ${{ env.app_name }}-${{ env.app_version }}.apk
+          draft: false
           body_path: RELEASE.txt
+          overwrite_files: false
+          make_latest: true
+          generate_release_notes: true
           files: |
-            build/${{ env.app_name }}
+            build/${{ env.app_name }}.apk

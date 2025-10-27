@@ -16,11 +16,6 @@ jobs:
   build_apk:
     runs-on: ubuntu-latest
     steps:
-      - name: Ref name
-        run: |
-          echo "Ref name: ${{ github.ref_name }}"
-          echo "Ref type: ${{ github.ref_type }}"
-
       - uses: actions/checkout@v5
       - run: cat .github/workflows/versions.env >> $GITHUB_ENV
 

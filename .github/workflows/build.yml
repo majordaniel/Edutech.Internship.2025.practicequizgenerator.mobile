@@ -39,8 +39,8 @@ jobs:
 
       - name: "Build release package"
         run: |
-          echo export MOCK_API_KEY='$API_KEY' >> .env
-          echo export EDUTECH_SWAGGER_URL='$API_URL' >> .env
+          echo export MOCK_API_KEY=$API_KEY >> .env
+          echo export EDUTECH_SWAGGER_URL=$API_URL >> .env
           cat .env | xxd
           flutter build apk --release
         env:

@@ -24,15 +24,17 @@ class _ReviewQuestionsScreenState extends State<ReviewQuestionsScreen> {
   @override
   void initState() {
     super.initState();
-    selectedAnswers = List<int?>.from(widget.selectedAnswers);
+    selectedAnswers = widget.selectedAnswers;
   }
 
   @override
   Widget build(BuildContext context) {
     final filteredQuestions = List.generate(widget.questions.length, (i) => i)
-        .where((i) => widget.showAnswered
-            ? selectedAnswers[i] != null
-            : selectedAnswers[i] == null)
+        .where(
+          (i) => widget.showAnswered
+              ? selectedAnswers[i] != null
+              : selectedAnswers[i] == null,
+        )
         .toList();
 
     return Scaffold(
@@ -63,15 +65,29 @@ class _ReviewQuestionsScreenState extends State<ReviewQuestionsScreen> {
                 final question = widget.questions[qIndex];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 20),
-                  child: QuestionCard(
-                    question: question['question'],
-                    options: List<String>.from(question['options']),
-                    selectedIndex: selectedAnswers[qIndex],
-                    onOptionSelected: (optIndex) {
-                      setState(() {
-                        selectedAnswers[qIndex] = optIndex;
-                      });
-                    },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Question ${qIndex + 1}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          color: AppColors.primaryDeepBlack,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      QuestionCard(
+                        question: question['question'],
+                        options: List<String>.from(question['options']),
+                        selectedIndex: selectedAnswers[qIndex],
+                        onOptionSelected: (optIndex) {
+                          setState(() {
+                            selectedAnswers[qIndex] = optIndex;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 );
               },

@@ -38,53 +38,42 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signinHandler(BuildContext ctx) async {
     final studentId = studentIdController.text;
     final password = passwordController.text;
-    bool hasError = true;
+    bool hasError = false;
     String errMsg = '';
 
     setState(() => loading = true);
-    api
-        .login(studentId, password)
-        .onError((e, _) {
-          // TODO: consider making this a generic 'Network is having a problem. Please try again.'
-          //       apart from failed log in attempt, of course
-          if (e is ApiRequestError) {
-            errMsg = e.message;
-          } else if (e is ApiTimeoutError) {
-            errMsg = 'Request timed out';
-          }
-          return false;
-        })
-        .then((r) async {
-          // clear the loading progress bar since we have the login result now
-          setState(() => loading = false);
+    try {
+      final r = await api.login(studentId, password);
+      setState(() => loading = false);
+      
+      print('login/message: success');
 
-          hasError = !r;
-          final report = r
-              ? '"$studentId" logged in successfully'
-              : 'error signing "$studentId" in: $errMsg';
+      userController.update(
+        User(studentId, 'ID-${studentId.replaceAll(' ', '-')}'),
+      );
 
-          print('login/message: $report');
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const BottomNavbar()),
+        );
+      }
+    } catch (e) {
+      setState(() => loading = false);
+      if (e is ApiRequestError) {
+        errMsg = e.message;
+      } else if (e is ApiTimeoutError) {
+        errMsg = 'Request timed out';
+      }
+      hasError = true;
 
-          if (hasError && mounted) {
-            final result = await showOkAlertDialog(
-              context: context,
-              title: 'Sign in',
-              message: errMsg,
-            );
-            print('AlertDialog: $result');
-            return;
-          }
-
-          userController.update(
-            User(studentId, 'ID-${studentId.replaceAll(' ', '-')}'),
-          );
-
-          if (!hasError && mounted) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const BottomNavbar()),
-            );
-          }
-        });
+      if (mounted) {
+        await showOkAlertDialog(
+          context: context,
+          title: 'Sign in',
+          message: errMsg,
+        );
+      }
+    }
   }
 
   @override

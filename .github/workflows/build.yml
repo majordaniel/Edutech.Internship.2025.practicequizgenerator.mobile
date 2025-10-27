@@ -62,5 +62,6 @@ jobs:
           name: ${{ env.app_name }}-${{ env.app_version }}
           draft: true
           body_path: RELEASE.txt
+          overwrite_files: false
           files: |
             build/${{ env.app_name }}

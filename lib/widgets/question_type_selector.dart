@@ -12,7 +12,7 @@ enum QuestionType {
   @override
   String toString() {
     return switch (this) {
-      mcq => 'Multiple Choice',
+      mcq => 'MCQ',
       theory => 'Theory',
       mixed => 'Mixed',
       pastQuestions => 'Past Questions',

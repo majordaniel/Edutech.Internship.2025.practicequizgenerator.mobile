@@ -43,6 +43,8 @@ class GreetingCard extends StatelessWidget {
         ),
         SizedBox(height: 2.0),
         CustomText(
+          // TODO: confirm that this makes sense, because right now User.id is tied to the users
+          // internal ID whatever that means. Maybe it's fine
           title: user.id,
           size: 10,
           color: AppColors.primaryLightBlack,

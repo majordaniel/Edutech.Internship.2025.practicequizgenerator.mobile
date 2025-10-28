@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' as path;
+import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/helper/helper.dart';
 import 'package:quiz_generator/main.dart';
@@ -35,6 +36,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
   int seconds = 0, minutes = 5;
   String? selectedValue;
+  int numberOfQuestions = 6;
   QuestionType selectedType = QuestionType.mcq;
   QuestionType generateFrom = QuestionType.aiGenerated;
 
@@ -126,6 +128,9 @@ class _MockSetupPageState extends State<MockSetupPage> {
                                 _generateQuestions(
                                   context,
                                   File(result.paths[0]!),
+                                  numberOfQuestions,
+                                  selectedType,
+                                  generateFrom,
                                 );
                               }
                             },
@@ -226,8 +231,10 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       const SizedBox(height: 8),
 
                       CompactNumberSpinner(
-                        initialValue: 0,
-                        onChanged: (val) {},
+                        initialValue: numberOfQuestions,
+                        onChanged: (val) {
+                          numberOfQuestions = val;
+                        },
                       ),
                       const SizedBox(height: 8),
                       CustomText(
@@ -334,7 +341,12 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
   }
 
-  Future<Quiz> loadQuiz(File file) async {
+  Future<Quiz> loadQuiz(
+    File file,
+    int numberOfQuestions,
+    QuestionType questionType,
+    QuestionType generateFrom,
+  ) async {
     final baseOptions = BaseOptions(
       baseUrl: api.baseUrl.toString(),
       // headers: {'X-API-Key': api.key},
@@ -349,8 +361,8 @@ class _MockSetupPageState extends State<MockSetupPage> {
     };
 
     var dat = FormData.fromMap({
-      'QuestionType': 'Multiple Choice Question',
-      'NumberOfQuestions': 44.toString(),
+      'QuestionType': questionType,
+      'NumberOfQuestions': numberOfQuestions,
       'File': await MultipartFile.fromFile(
         file.path,
         filename: file.path,
@@ -365,19 +377,28 @@ class _MockSetupPageState extends State<MockSetupPage> {
       queryParameters: Map.fromEntries(dat.fields),
     );
 
-    var data = response.data['data'] as Map<String, Object?>;
-    if (data case {
-      'qizId': int? quizId,
-      'questions': List<dynamic> questions,
-    }) {
-      var quiz = Quiz.fromList(quizId ?? 0, questions);
-      return quiz;
-    } else {
-      throw 'Invalid form from server';
+    final data = ApiResponse.fromHttpResponse(
+      response.data as Map<String, dynamic>,
+    );
+    if (data != null && data.succeeded) {
+      if (data.data case {
+        'qizId': int? quizId,
+        'questions': List<dynamic> questions,
+      }) {
+        var quiz = Quiz.fromList(quizId ?? 0, questions);
+        return quiz;
+      }
     }
+    throw 'Invalid form from server';
   }
 
-  Future<dynamic> _generateQuestions(BuildContext context, File file) {
+  Future<dynamic> _generateQuestions(
+    BuildContext context,
+    File file,
+    int numberOfQuestions,
+    QuestionType questionType,
+    QuestionType generateFrom,
+  ) {
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -386,7 +407,9 @@ class _MockSetupPageState extends State<MockSetupPage> {
         Quiz? quiz;
         return StatefulBuilder(
           builder: (context, setState) {
-            loadQuiz(file).then((q) {
+            loadQuiz(file, numberOfQuestions, questionType, generateFrom).then((
+              q,
+            ) {
               setState(() {
                 quiz = q;
                 isLoading = false;

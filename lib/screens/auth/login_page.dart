@@ -38,33 +38,32 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signinHandler(BuildContext ctx) async {
     final studentId = studentIdController.text;
     final password = passwordController.text;
-    bool hasError = false;
     String errMsg = '';
 
     setState(() => loading = true);
     try {
-      final r = await api.login(studentId, password);
+      final user = await api.login(studentId, password);
       setState(() => loading = false);
-      
-      print('login/message: success');
-
-      userController.update(
-        User(studentId, 'ID-${studentId.replaceAll(' ', '-')}'),
-      );
-
+      userController.update(user);
+      print('login/message: success: $user');
       if (mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const BottomNavbar()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const BottomNavbar()));
       }
     } catch (e) {
       setState(() => loading = false);
-      if (e is ApiRequestError) {
-        errMsg = e.message;
-      } else if (e is ApiTimeoutError) {
-        errMsg = 'Request timed out';
+      switch (e) {
+        case ApiLoginError(message: var message):
+          errMsg = message;
+        case ApiTimeoutError():
+          errMsg = 'Network error. Please try again after some time.';
+        case ApiRequestError(message: var message):
+          errMsg = 'Network error. Please try again after some time.';
+        case _:
+          errMsg = 'An error has occurred: Please try again after some time.';
       }
-      hasError = true;
+      print('E: $e');
 
       if (mounted) {
         await showOkAlertDialog(

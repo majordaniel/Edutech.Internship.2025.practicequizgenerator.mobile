@@ -1,13 +1,51 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart' show BaseOptions, Dio, DioException;
+import 'package:quiz_generator/models/user.dart' show User;
 
 bool _initialised = false;
 Api? _api;
 
 const loginRequestTimeout = Duration(seconds: 10);
+
+class ApiResponse {
+  final int statusCode;
+  final bool succeeded;
+  final String message;
+  final Map<String, dynamic>? data;
+
+  ApiResponse._({
+    required this.statusCode,
+    required this.succeeded,
+    required this.message,
+    required this.data,
+  });
+
+  @override
+  String toString() => {
+    'statusCode': statusCode,
+    'succeeded': succeeded,
+    'message': message,
+    'data': data,
+  }.toString();
+
+  static ApiResponse? fromHttpResponse(Map<String, dynamic> httpResponse) {
+    if (httpResponse case {
+      'statusCode': int statusCode,
+      'succeeded': bool succeeded,
+      'message': String message,
+      'data': Map<String, dynamic>? data,
+    }) {
+      return ApiResponse._(
+        statusCode: statusCode,
+        succeeded: succeeded,
+        message: message,
+        data: data,
+      );
+    } else {
+      return null;
+    }
+  }
+}
 
 class Api {
   final String key;
@@ -15,7 +53,9 @@ class Api {
   String? _token;
   String? _refreshToken;
 
-  Api._(this.baseUrl, this.key);
+  final Dio dio;
+
+  Api._(this.baseUrl, this.key, this.dio);
 
   static Future<Api> init({
     required String baseUrl,
@@ -23,160 +63,100 @@ class Api {
   }) async {
     if (_initialised) return _api!;
 
+    final baseOptions = BaseOptions(
+      baseUrl: '$baseUrl/api',
+      // headers: {'X-API-Key': api.key},
+    );
+    final dio = Dio(baseOptions);
+    _api = Api._(Uri.parse(baseOptions.baseUrl), apiKey, dio);
     _initialised = true;
-    _api = Api._(Uri.parse('$baseUrl/api'), apiKey);
     return _api!;
   }
 
   /// LOGIN: Stores token and refresh token
-  Future<void> login(String email, String password) async {
+  Future<User> login(String email, String password) async {
+    // TODO: the error/exception handling here is very ugly and I hate it
+    // just do something simple like using constants instead of throwing
     try {
-      final response = await http
-          .post(
-            Uri.parse('$baseUrl/Auth/login'),
-            headers: {
-              'X-API-Key': key,
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({'email': email, 'password': password}),
-          )
-          .timeout(loginRequestTimeout, onTimeout: () => throw ApiTimeoutError());
+      final response = await dio
+          .post('/Auth/login', data: {'email': email, 'password': password})
+          .timeout(
+            loginRequestTimeout,
+            onTimeout: () => throw ApiTimeoutError(),
+          );
 
       if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        _token = body['token'];
-        _refreshToken = body['refreshToken']; // if your API returns a refresh token
-      } else if (response.statusCode == 401) {
-        throw ApiRequestError('Unauthorized: Invalid credentials');
+        final r = ApiResponse.fromHttpResponse(response.data);
+        if (r == null) {
+          throw ApiRequestError('Http error');
+        }
+
+        if (r.succeeded) {
+          print('response: $r');
+
+          final body = response.data;
+          _token = body['token'];
+          _refreshToken =
+              body['refreshToken']; // if your API returns a refresh token
+
+          // Now try to fetch the user's credentials
+          return _fetchUser(email);
+        } else {
+          throw ApiLoginError();
+        }
       } else {
-        throw ApiRequestError('Error ${response.statusCode}: ${response.body}');
+        throw ApiRequestError('Error ${response.statusCode}: ${response.data}');
       }
-    } on SocketException catch (err) {
+    } on DioException catch (err) {
       throw ApiRequestError('Network error: ${err.message}');
     }
   }
 
-  /// REGISTRATION
-  Future<bool> registerUser(RegistrationParameters params) async {
+  Future<User> _fetchUser(String email) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/Auth/register'),
-        headers: {
-          'X-API-Key': key,
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(params.toJson()),
+      final getResponse = await dio.get(
+        '/User/email',
+        queryParameters: {'email': email},
       );
 
-      if (response.statusCode == 201 || response.statusCode == 200) return true;
+      if (getResponse.statusCode == 200) {
+        final r = ApiResponse.fromHttpResponse(getResponse.data);
+        if (r == null) {
+          throw ApiRequestError('Http error');
+        }
 
-      throw ApiRequestError('Error ${response.statusCode}: ${response.body}');
-    } on SocketException catch (err) {
-      throw ApiRequestError('Network error: ${err.message}');
-    }
-  }
-
-  /// GET request with automatic token refresh
-  Future<http.Response> get(String endpoint) async {
-    if (_token == null) throw ApiRequestError('Not authenticated. Please login first.');
-
-    try {
-      final response = await _makeRequest('GET', endpoint);
-
-      if (response.statusCode == 401 && _refreshToken != null) {
-        // Token expired, try refreshing
-        await _refreshAuthToken();
-        return await _makeRequest('GET', endpoint); // retry
+        if (r.succeeded) {
+          if (r.data! case {
+            'id': String id,
+            'firstName': String firstName,
+            'lastName': String lastName,
+          }) {
+            final username = '$firstName $lastName';
+            return User(username, id);
+          }
+          throw ApiRequestError(
+            'Internal: Response data format not matched: ${r.data}',
+          );
+        }
       }
-
-      return response;
-    } on SocketException catch (err) {
-      throw ApiRequestError('Network error: ${err.message}');
+      throw ApiRequestError('Unauthorized/User/email: Invalid credentials');
+    } on DioException catch (e) {
+      throw ApiRequestError('Network error: ${e.message}');
     }
   }
+}
 
-  /// INTERNAL: Makes HTTP request with auth header
-  Future<http.Response> _makeRequest(String method, String endpoint) async {
-    final headers = {
-      'X-API-Key': key,
-      'Authorization': 'Bearer $_token',
-      'Content-Type': 'application/json',
-    };
-
-    switch (method) {
-      case 'GET':
-        return await http.get(Uri.parse('$baseUrl/$endpoint'), headers: headers);
-      default:
-        throw ApiRequestError('HTTP method $method not implemented');
-    }
-  }
-
-  /// INTERNAL: Refresh auth token
-  Future<void> _refreshAuthToken() async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/Auth/refresh-token'),
-        headers: {
-          'X-API-Key': key,
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'refreshToken': _refreshToken}),
-      );
-
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        _token = body['token'];
-        _refreshToken = body['refreshToken']; // update refresh token if provided
-      } else {
-        throw ApiRequestError('Unable to refresh token. Please login again.');
-      }
-    } on SocketException catch (err) {
-      throw ApiRequestError('Network error while refreshing token: ${err.message}');
-    }
-  }
+class ApiLoginError extends ApiRequestError {
+  ApiLoginError() : super('Login failed: email or password incorrect');
 }
 
 class ApiTimeoutError extends Error {}
 
 class ApiRequestError extends Error {
   final String message;
+
   ApiRequestError(this.message);
-}
 
-typedef RegistraionNumber = int;
-typedef LevelCode = String;
-
-class RegistrationParameters {
-  final String firstName;
-  final String lastName;
-  final String otherName;
-  final String email;
-  final String departmentName;
-  final String facultyName;
-  final RegistraionNumber registrationNumber;
-  final LevelCode currentLevelCode;
-
-  RegistrationParameters({
-    required this.firstName,
-    required this.lastName,
-    required this.otherName,
-    required this.email,
-    required this.departmentName,
-    required this.facultyName,
-    required this.registrationNumber,
-    required this.currentLevelCode,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'firstName': firstName,
-      'lastName': lastName,
-      'otherName': otherName,
-      'email': email,
-      'departmentName': departmentName,
-      'facultyName': facultyName,
-      'registrationNumber': registrationNumber,
-      'currentLevelCode': currentLevelCode,
-    };
-  }
+  @override
+  String toString() => message;
 }

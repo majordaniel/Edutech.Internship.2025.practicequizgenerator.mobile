@@ -10,6 +10,7 @@ import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/helper/helper.dart';
 import 'package:quiz_generator/main.dart';
 import 'package:quiz_generator/models/quiz.dart';
+import 'package:quiz_generator/models/user.dart' show User;
 import 'package:quiz_generator/screens/quiz_screen.dart';
 import 'package:quiz_generator/widgets/custom_button.dart';
 import 'package:quiz_generator/widgets/custom_text.dart';
@@ -17,6 +18,44 @@ import 'package:quiz_generator/widgets/custom_text.dart';
 import '../widgets/custom_dialog.dart';
 import '../widgets/number_of_questions.dart';
 import '../widgets/question_type_selector.dart';
+
+enum QuestionSource {
+  fileUpload,
+  questionBank;
+
+  @override
+  String toString() {
+    return switch (this) {
+      fileUpload => 'File Upload',
+      questionBank => 'Question Bank',
+    };
+  }
+}
+
+class QuestionGenerateOptions {
+  final courseId =
+      'e7a9b6d8-0c2c-4a68-a777-4cd5aa3b68ad'; // Intro to Programming
+  final QuestionSource qSource;
+  final int timer = 6969;
+  final QuestionType qType;
+  final int numQuestions;
+
+  QuestionGenerateOptions({
+    required this.qType,
+    required this.qSource,
+    required this.numQuestions,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'CourseId': courseId,
+      'QuestionSource': qSource.toString(),
+      'Timer': timer,
+      'QuestionType': qType.toString(),
+      'NumberOfQuestions': numQuestions,
+    };
+  }
+}
 
 class MockSetupPage extends StatefulWidget {
   const MockSetupPage({super.key});
@@ -124,10 +163,11 @@ class _MockSetupPageState extends State<MockSetupPage> {
                                     type: FileType.custom,
                                   );
                               if (result == null) return;
+                              final file = result.files[0];
                               if (context.mounted) {
                                 _generateQuestions(
                                   context,
-                                  File(result.paths[0]!),
+                                  File(file.path!),
                                   numberOfQuestions,
                                   selectedType,
                                   generateFrom,
@@ -342,17 +382,10 @@ class _MockSetupPageState extends State<MockSetupPage> {
   }
 
   Future<Quiz> loadQuiz(
+    User user,
     File file,
-    int numberOfQuestions,
-    QuestionType questionType,
-    QuestionType generateFrom,
+    QuestionGenerateOptions options,
   ) async {
-    final baseOptions = BaseOptions(
-      baseUrl: api.baseUrl.toString(),
-      // headers: {'X-API-Key': api.key},
-    );
-    final dio = Dio(baseOptions);
-
     final ext = path.extension(file.path);
     final mime = switch (ext) {
       '.txt' => MediaType('text', 'plain'),
@@ -360,19 +393,20 @@ class _MockSetupPageState extends State<MockSetupPage> {
       _ => throw 'Internal Error: $ext',
     };
 
-    var dat = FormData.fromMap({
-      'QuestionType': questionType,
-      'NumberOfQuestions': numberOfQuestions,
-      'File': await MultipartFile.fromFile(
-        file.path,
-        filename: file.path,
-        contentType: mime,
-      ),
-    });
+    final dat = FormData.fromMap(
+      options.toJson()..addAll({
+        'UserId': user.id,
+        'File': await MultipartFile.fromFile(
+          file.path,
+          filename: file.path,
+          contentType: mime,
+        ),
+      }),
+    );
 
     // TODO: implement a loading screen for this
-    var response = await dio.post(
-      '/Quiz/generatefromfile',
+    var response = await api.dio.post(
+      '/Quiz/generate',
       data: dat,
       queryParameters: Map.fromEntries(dat.fields),
     );
@@ -395,10 +429,19 @@ class _MockSetupPageState extends State<MockSetupPage> {
   Future<dynamic> _generateQuestions(
     BuildContext context,
     File file,
-    int numberOfQuestions,
+    int numQuestions,
     QuestionType questionType,
     QuestionType generateFrom,
   ) {
+    final genOptions = QuestionGenerateOptions(
+      qType: questionType,
+      numQuestions: numQuestions,
+      qSource: generateFrom == QuestionType.aiGenerated
+          ? QuestionSource.fileUpload
+          // TODO: right here
+          : QuestionSource.fileUpload,
+    );
+
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -407,9 +450,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
         Quiz? quiz;
         return StatefulBuilder(
           builder: (context, setState) {
-            loadQuiz(file, numberOfQuestions, questionType, generateFrom).then((
-              q,
-            ) {
+            loadQuiz(userController.user, file, genOptions).then((q) {
               setState(() {
                 quiz = q;
                 isLoading = false;

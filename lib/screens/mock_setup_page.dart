@@ -156,18 +156,9 @@ class _MockSetupPageState extends State<MockSetupPage> {
                             buttonWidth: 90,
                             borderRadius: 12.06,
                             onTap: () async {
-                              FilePickerResult? result = await FilePicker
-                                  .platform
-                                  .pickFiles(
-                                    allowedExtensions: ['txt', 'pdf'],
-                                    type: FileType.custom,
-                                  );
-                              if (result == null) return;
-                              final file = result.files[0];
                               if (context.mounted) {
                                 _generateQuestions(
                                   context,
-                                  File(file.path!),
                                   numberOfQuestions,
                                   selectedType,
                                   generateFrom,
@@ -381,28 +372,33 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
   }
 
-  Future<Quiz> loadQuiz(
-    User user,
-    File file,
-    QuestionGenerateOptions options,
-  ) async {
-    final ext = path.extension(file.path);
-    final mime = switch (ext) {
-      '.txt' => MediaType('text', 'plain'),
-      '.pdf' => MediaType('application', 'pdf'),
-      _ => throw 'Internal Error: $ext',
-    };
+  Future<Quiz> loadQuiz(User user, QuestionGenerateOptions options) async {
+    var opts = options.toJson();
+    opts['UserId'] = user.id;
 
-    final dat = FormData.fromMap(
-      options.toJson()..addAll({
-        'UserId': user.id,
-        'File': await MultipartFile.fromFile(
-          file.path,
-          filename: file.path,
-          contentType: mime,
-        ),
-      }),
-    );
+    if (options.qSource == QuestionSource.fileUpload) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowedExtensions: ['txt', 'pdf'],
+        type: FileType.custom,
+      );
+      if (result == null) throw 'Picker exception';
+      final file = result.files[0];
+      final path_ = file.path!;
+      final ext = path.extension(path_);
+      final mime = switch (ext) {
+        '.txt' => MediaType('text', 'plain'),
+        '.pdf' => MediaType('application', 'pdf'),
+        _ => throw 'Internal Error: $ext',
+      };
+
+      opts['File'] = await MultipartFile.fromFile(
+        path_,
+        filename: file.path,
+        contentType: mime,
+      );
+    }
+
+    final dat = FormData.fromMap(opts);
 
     // TODO: implement a loading screen for this
     var response = await api.dio.post(
@@ -428,7 +424,6 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
   Future<dynamic> _generateQuestions(
     BuildContext context,
-    File file,
     int numQuestions,
     QuestionType questionType,
     QuestionType generateFrom,
@@ -439,7 +434,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
       qSource: generateFrom == QuestionType.aiGenerated
           ? QuestionSource.fileUpload
           // TODO: right here
-          : QuestionSource.fileUpload,
+          : QuestionSource.questionBank,
     );
 
     return showDialog(
@@ -450,7 +445,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
         Quiz? quiz;
         return StatefulBuilder(
           builder: (context, setState) {
-            loadQuiz(userController.user, file, genOptions).then((q) {
+            loadQuiz(userController.user, genOptions).then((q) {
               setState(() {
                 quiz = q;
                 isLoading = false;

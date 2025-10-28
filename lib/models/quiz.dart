@@ -32,7 +32,7 @@ class Quiz {
     List<Question> qs = [];
     for (Map<String, dynamic> quizMap in questions) {
       if (quizMap case {
-        'question': String question,
+        'questionText': String question,
         'correctOptionIndex': int correctOptionIndex,
         'options': List opts,
       }) {

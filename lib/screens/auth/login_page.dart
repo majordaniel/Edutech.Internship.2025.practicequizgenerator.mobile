@@ -2,7 +2,6 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/main.dart';
-import 'package:quiz_generator/models/user.dart';
 import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
 
 import '../../constant/color.dart';
@@ -59,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
           errMsg = message;
         case ApiTimeoutError():
           errMsg = 'Network error. Please try again after some time.';
-        case ApiRequestError(message: var message):
+        case ApiRequestError():
           errMsg = 'Network error. Please try again after some time.';
         case _:
           errMsg = 'An error has occurred: Please try again after some time.';

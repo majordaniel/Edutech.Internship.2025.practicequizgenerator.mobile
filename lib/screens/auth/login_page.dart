@@ -22,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool loading = false;
   bool _rememberMe = false;
+  bool _showPassword = false;
 
   Widget checkbox() {
     return Checkbox(
@@ -181,11 +182,23 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(height: 8),
                         TextFormField(
                           controller: passwordController,
-                          obscureText: true,
+                          obscureText: !_showPassword,
                           decoration: InputDecoration(
-                            suffixIcon: const Icon(
-                              Icons.visibility_outlined,
-                              color: AppColors.primaryGrey,
+                            suffixIcon: OutlinedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _showPassword = !_showPassword;
+                                });
+                              },
+                              label: _showPassword
+                                  ? const Icon(
+                                      Icons.visibility_outlined,
+                                      color: AppColors.primaryGrey,
+                                    )
+                                  : const Icon(
+                                      Icons.visibility_off_outlined,
+                                      color: AppColors.primaryGrey,
+                                    ),
                             ),
                             hintText: "Enter password",
                             hintStyle: TextStyle(color: AppColors.primaryGrey),

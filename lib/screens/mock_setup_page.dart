@@ -412,10 +412,10 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
     if (data != null && data.succeeded) {
       if (data.data case {
-        'quizId': int? quizId,
+        'quizId': String? quizId,
         'questions': List<dynamic> questions,
       }) {
-        var quiz = Quiz.fromList(quizId ?? 0, questions);
+        var quiz = Quiz.fromList(66, questions);
         return quiz;
       }
     }

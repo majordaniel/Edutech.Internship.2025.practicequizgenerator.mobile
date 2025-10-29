@@ -75,7 +75,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
   int seconds = 0, minutes = 5;
   String? selectedValue;
-  int numberOfQuestions = 6;
+  int numberOfQuestions = 16;
   QuestionType selectedType = QuestionType.mcq;
   QuestionType generateFrom = QuestionType.aiGenerated;
 
@@ -421,7 +421,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
         return quiz;
       }
     }
-    throw 'Invalid form from server';
+    throw 'Invalid form from server: $data';
   }
 
   Future<dynamic> _generateQuestions(
@@ -447,6 +447,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             if (quiz == null) {
+              print('loading quiz');
               loadQuiz(userController.user, genOptions).then((q) {
                 setState(() {
                   quiz = q;

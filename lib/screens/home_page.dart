@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         color: Colors.white.withOpacity(
-                          0.3,
+                          0.1,
                         ), // optional overlay tint
                       ),
                       padding: const EdgeInsets.fromLTRB(16, 16, 0, 16),
@@ -198,49 +198,53 @@ class _HomePageState extends State<HomePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(5.0, 30.0, 5.0, 30.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 59.88,
-                          width: 59.88,
-                          padding: const EdgeInsets.all(6.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(32),
-                            color: const Color(0xFFFEF0EA),
-                          ),
-                          child: const ImageIcon(
-                            AssetImage(
-                              'assets/icons/learning-tools_18843128 1.png',
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 250,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(5.0, 30.0, 5.0, 30.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: 59.88,
+                            width: 59.88,
+                            padding: const EdgeInsets.all(6.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(32),
+                              color: const Color(0xFFFEF0EA),
                             ),
-                            size: 35.22,
-                            color: AppColors.primaryDeepBlack,
+                            child: const ImageIcon(
+                              AssetImage(
+                                'assets/icons/learning-tools_18843128 1.png',
+                              ),
+                              size: 35.22,
+                              color: AppColors.primaryDeepBlack,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 15),
-                        CustomText(
-                          title: "Your Exam Activity & Progress",
-                          size: 12,
-                          color: AppColors.primaryOrange,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        const SizedBox(height: 6),
-                        CustomText(
-                          title: "You haven’t attempted any exams yet.",
-                          size: 10,
-                          color: AppColors.primaryLightBlack,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        CustomText(
-                          title:
-                              "Start with a practice quiz to build confidence before your first test.",
-                          size: 10,
-                          color: AppColors.primaryLightBlack,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ],
+                          const SizedBox(height: 15),
+                          CustomText(
+                            title: "Your Exam Activity & Progress",
+                            size: 12,
+                            color: AppColors.primaryOrange,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          const SizedBox(height: 6),
+                          CustomText(
+                            title: "You haven’t attempted any exams yet.",
+                            size: 10,
+                            color: AppColors.primaryLightBlack,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          CustomText(
+                            title:
+                                "Start with a practice quiz to build confidence before your first test.",
+                            size: 10,
+                            color: AppColors.primaryLightBlack,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

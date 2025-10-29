@@ -383,8 +383,8 @@ class _MockSetupPageState extends State<MockSetupPage> {
       );
       if (result == null) throw 'Picker exception';
       final file = result.files[0];
-      final path_ = file.path!;
-      final ext = path.extension(path_);
+      final fpath = file.path!;
+      final ext = path.extension(fpath);
       final mime = switch (ext) {
         '.txt' => MediaType('text', 'plain'),
         '.pdf' => MediaType('application', 'pdf'),
@@ -392,7 +392,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
       };
 
       opts['File'] = await MultipartFile.fromFile(
-        path_,
+        fpath,
         filename: file.path,
         contentType: mime,
       );

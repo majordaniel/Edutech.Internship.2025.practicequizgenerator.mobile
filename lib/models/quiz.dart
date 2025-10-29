@@ -67,7 +67,7 @@ class Quiz {
 
 extension GetFail on Map<String, dynamic> {
   dynamic getFail(String k) {
-    if (this.containsKey(k)) {
+    if (containsKey(k)) {
       return this[k];
     } else {
       throw 'Map/getFail: "$k" not found';

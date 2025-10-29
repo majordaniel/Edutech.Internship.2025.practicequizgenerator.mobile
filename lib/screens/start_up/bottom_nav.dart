@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_generator/screens/signout_page.dart';
+import 'package:quiz_generator/screens/account_page.dart';
 import 'package:quiz_generator/screens/mock_exam.dart';
 
 import '../../constant/color.dart';
@@ -25,7 +25,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
     //   color: AppColors.primaryOrange,
     //   fontWeight: FontWeight.bold,
     // ),
-    SignoutPage(),
+    AccountPage(),
     // CustomText(
     //   title: "Account",
     //   size: 20,
@@ -100,15 +100,15 @@ class _BottomNavbarState extends State<BottomNavbar> {
             icon: Padding(
               padding: EdgeInsets.only(top: 6.0),
               child: ImageIcon(
-                AssetImage('assets/icons/Logout.png'),
+                AssetImage('assets/icons/Profile.png'),
                 color: AppColors.primaryGrey,
               ),
             ),
-            label: 'Sign Out',
+            label: 'Account',
             activeIcon: Padding(
               padding: EdgeInsets.only(top: 6.0),
               child: ImageIcon(
-                AssetImage('assets/icons/Logout2.png'),
+                AssetImage('assets/icons/Profile2.png'),
                 color: AppColors.primaryOrange,
               ),
             ),

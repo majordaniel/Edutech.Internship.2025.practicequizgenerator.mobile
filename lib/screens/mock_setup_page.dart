@@ -263,6 +263,8 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
                       CompactNumberSpinner(
                         initialValue: numberOfQuestions,
+                        minValue: 6,
+                        maxValue: 256,
                         onChanged: (val) {
                           numberOfQuestions = val;
                         },

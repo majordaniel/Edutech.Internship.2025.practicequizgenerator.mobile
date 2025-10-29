@@ -26,8 +26,8 @@ enum QuestionSource {
   @override
   String toString() {
     return switch (this) {
-      fileUpload => 'File Upload',
-      questionBank => 'Question Bank',
+      fileUpload => 'FileUpload',
+      questionBank => 'QuestionBank',
     };
   }
 }
@@ -433,7 +433,6 @@ class _MockSetupPageState extends State<MockSetupPage> {
       numQuestions: numQuestions,
       qSource: generateFrom == QuestionType.aiGenerated
           ? QuestionSource.fileUpload
-          // TODO: right here
           : QuestionSource.questionBank,
     );
 
@@ -445,12 +444,14 @@ class _MockSetupPageState extends State<MockSetupPage> {
         Quiz? quiz;
         return StatefulBuilder(
           builder: (context, setState) {
-            loadQuiz(userController.user, genOptions).then((q) {
-              setState(() {
-                quiz = q;
-                isLoading = false;
+            if (quiz == null) {
+              loadQuiz(userController.user, genOptions).then((q) {
+                setState(() {
+                  quiz = q;
+                  isLoading = false;
+                });
               });
-            });
+            }
 
             return isLoading
                 ? const CustomDialog(

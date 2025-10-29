@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' as path;
+import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/helper/helper.dart';
 import 'package:quiz_generator/main.dart';
 import 'package:quiz_generator/models/quiz.dart';
+import 'package:quiz_generator/models/user.dart' show User;
 import 'package:quiz_generator/screens/quiz_screen.dart';
 import 'package:quiz_generator/widgets/custom_button.dart';
 import 'package:quiz_generator/widgets/custom_text.dart';
@@ -16,6 +18,44 @@ import 'package:quiz_generator/widgets/custom_text.dart';
 import '../widgets/custom_dialog.dart';
 import '../widgets/number_of_questions.dart';
 import '../widgets/question_type_selector.dart';
+
+enum QuestionSource {
+  fileUpload,
+  questionBank;
+
+  @override
+  String toString() {
+    return switch (this) {
+      fileUpload => 'FileUpload',
+      questionBank => 'QuestionBank',
+    };
+  }
+}
+
+class QuestionGenerateOptions {
+  final courseId =
+      'e7a9b6d8-0c2c-4a68-a777-4cd5aa3b68ad'; // Intro to Programming
+  final QuestionSource qSource;
+  final int timer = 6969;
+  final QuestionType qType;
+  final int numQuestions;
+
+  QuestionGenerateOptions({
+    required this.qType,
+    required this.qSource,
+    required this.numQuestions,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'CourseId': courseId,
+      'QuestionSource': qSource.toString(),
+      'Timer': timer,
+      'QuestionType': qType.toString(),
+      'NumberOfQuestions': numQuestions,
+    };
+  }
+}
 
 class MockSetupPage extends StatefulWidget {
   const MockSetupPage({super.key});
@@ -35,6 +75,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
   int seconds = 0, minutes = 5;
   String? selectedValue;
+  int numberOfQuestions = 6;
   QuestionType selectedType = QuestionType.mcq;
   QuestionType generateFrom = QuestionType.aiGenerated;
 
@@ -115,17 +156,12 @@ class _MockSetupPageState extends State<MockSetupPage> {
                             buttonWidth: 90,
                             borderRadius: 12.06,
                             onTap: () async {
-                              FilePickerResult? result = await FilePicker
-                                  .platform
-                                  .pickFiles(
-                                    allowedExtensions: ['txt', 'pdf'],
-                                    type: FileType.custom,
-                                  );
-                              if (result == null) return;
                               if (context.mounted) {
                                 _generateQuestions(
                                   context,
-                                  File(result.paths[0]!),
+                                  numberOfQuestions,
+                                  selectedType,
+                                  generateFrom,
                                 );
                               }
                             },
@@ -226,8 +262,12 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       const SizedBox(height: 8),
 
                       CompactNumberSpinner(
-                        initialValue: 0,
-                        onChanged: (val) {},
+                        initialValue: numberOfQuestions,
+                        minValue: 6,
+                        maxValue: 256,
+                        onChanged: (val) {
+                          numberOfQuestions = val;
+                        },
                       ),
                       const SizedBox(height: 8),
                       CustomText(
@@ -334,50 +374,70 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
   }
 
-  Future<Quiz> loadQuiz(File file) async {
-    final baseOptions = BaseOptions(
-      baseUrl: api.baseUrl.toString(),
-      // headers: {'X-API-Key': api.key},
-    );
-    final dio = Dio(baseOptions);
+  Future<Quiz> loadQuiz(User user, QuestionGenerateOptions options) async {
+    var opts = options.toJson();
+    opts['UserId'] = user.id;
 
-    final ext = path.extension(file.path);
-    final mime = switch (ext) {
-      '.txt' => MediaType('text', 'plain'),
-      '.pdf' => MediaType('application', 'pdf'),
-      _ => throw 'Internal Error: $ext',
-    };
+    if (options.qSource == QuestionSource.fileUpload) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowedExtensions: ['txt', 'pdf'],
+        type: FileType.custom,
+      );
+      if (result == null) throw 'Picker exception';
+      final file = result.files[0];
+      final fpath = file.path!;
+      final ext = path.extension(fpath);
+      final mime = switch (ext) {
+        '.txt' => MediaType('text', 'plain'),
+        '.pdf' => MediaType('application', 'pdf'),
+        _ => throw 'Internal Error: $ext',
+      };
 
-    var dat = FormData.fromMap({
-      'QuestionType': 'Multiple Choice Question',
-      'NumberOfQuestions': 44.toString(),
-      'File': await MultipartFile.fromFile(
-        file.path,
+      opts['File'] = await MultipartFile.fromFile(
+        fpath,
         filename: file.path,
         contentType: mime,
-      ),
-    });
+      );
+    }
+
+    final dat = FormData.fromMap(opts);
 
     // TODO: implement a loading screen for this
-    var response = await dio.post(
-      '/Quiz/generatefromfile',
+    var response = await api.dio.post(
+      '/Quiz/generate',
       data: dat,
       queryParameters: Map.fromEntries(dat.fields),
     );
 
-    var data = response.data['data'] as Map<String, Object?>;
-    if (data case {
-      'qizId': int? quizId,
-      'questions': List<dynamic> questions,
-    }) {
-      var quiz = Quiz.fromList(quizId ?? 0, questions);
-      return quiz;
-    } else {
-      throw 'Invalid form from server';
+    final data = ApiResponse.fromHttpResponse(
+      response.data as Map<String, dynamic>,
+    );
+    if (data != null && data.succeeded) {
+      if (data.data case {
+        'quizId': String? quizId,
+        'questions': List<dynamic> questions,
+      }) {
+        var quiz = Quiz.fromList(66, questions);
+        return quiz;
+      }
     }
+    throw 'Invalid form from server';
   }
 
-  Future<dynamic> _generateQuestions(BuildContext context, File file) {
+  Future<dynamic> _generateQuestions(
+    BuildContext context,
+    int numQuestions,
+    QuestionType questionType,
+    QuestionType generateFrom,
+  ) {
+    final genOptions = QuestionGenerateOptions(
+      qType: questionType,
+      numQuestions: numQuestions,
+      qSource: generateFrom == QuestionType.aiGenerated
+          ? QuestionSource.fileUpload
+          : QuestionSource.questionBank,
+    );
+
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -386,12 +446,14 @@ class _MockSetupPageState extends State<MockSetupPage> {
         Quiz? quiz;
         return StatefulBuilder(
           builder: (context, setState) {
-            loadQuiz(file).then((q) {
-              setState(() {
-                quiz = q;
-                isLoading = false;
+            if (quiz == null) {
+              loadQuiz(userController.user, genOptions).then((q) {
+                setState(() {
+                  quiz = q;
+                  isLoading = false;
+                });
               });
-            });
+            }
 
             return isLoading
                 ? const CustomDialog(

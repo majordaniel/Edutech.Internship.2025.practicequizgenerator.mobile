@@ -32,11 +32,13 @@ class Quiz {
     List<Question> qs = [];
     for (Map<String, dynamic> quizMap in questions) {
       if (quizMap case {
-        'question': String question,
+        'questionText': String question,
         'correctOptionIndex': int correctOptionIndex,
         'options': List opts,
       }) {
-        var options = List.castFrom<dynamic, String>(opts);
+        var options = List.castFrom<dynamic, Map<String, dynamic>>(
+          opts,
+        ).map((o) => o['text'] as String).toList();
         qs.add(
           Question(
             question: question,

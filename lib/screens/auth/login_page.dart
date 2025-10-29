@@ -2,7 +2,6 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/main.dart';
-import 'package:quiz_generator/models/user.dart';
 import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
 
 import '../../constant/color.dart';
@@ -22,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool loading = false;
   bool _rememberMe = false;
+  bool _showPassword = false;
 
   Widget checkbox() {
     return Checkbox(
@@ -38,33 +38,32 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signinHandler(BuildContext ctx) async {
     final studentId = studentIdController.text;
     final password = passwordController.text;
-    bool hasError = false;
     String errMsg = '';
 
     setState(() => loading = true);
     try {
-      final r = await api.login(studentId, password);
+      final user = await api.login(studentId, password);
       setState(() => loading = false);
-      
-      print('login/message: success');
-
-      userController.update(
-        User(studentId, 'ID-${studentId.replaceAll(' ', '-')}'),
-      );
-
+      userController.update(user);
+      print('login/message: success: $user');
       if (mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const BottomNavbar()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const BottomNavbar()));
       }
     } catch (e) {
       setState(() => loading = false);
-      if (e is ApiRequestError) {
-        errMsg = e.message;
-      } else if (e is ApiTimeoutError) {
-        errMsg = 'Request timed out';
+      switch (e) {
+        case ApiLoginError(message: var message):
+          errMsg = message;
+        case ApiTimeoutError():
+          errMsg = 'Network error. Please try again after some time.';
+        case ApiRequestError():
+          errMsg = 'Network error. Please try again after some time.';
+        case _:
+          errMsg = 'An error has occurred: Please try again after some time.';
       }
-      hasError = true;
+      print('E: $e');
 
       if (mounted) {
         await showOkAlertDialog(
@@ -182,11 +181,23 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(height: 8),
                         TextFormField(
                           controller: passwordController,
-                          obscureText: true,
+                          obscureText: !_showPassword,
                           decoration: InputDecoration(
-                            suffixIcon: const Icon(
-                              Icons.visibility_outlined,
-                              color: AppColors.primaryGrey,
+                            suffixIcon: OutlinedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _showPassword = !_showPassword;
+                                });
+                              },
+                              label: _showPassword
+                                  ? const Icon(
+                                      Icons.visibility_outlined,
+                                      color: AppColors.primaryGrey,
+                                    )
+                                  : const Icon(
+                                      Icons.visibility_off_outlined,
+                                      color: AppColors.primaryGrey,
+                                    ),
                             ),
                             hintText: "Enter password",
                             hintStyle: TextStyle(color: AppColors.primaryGrey),

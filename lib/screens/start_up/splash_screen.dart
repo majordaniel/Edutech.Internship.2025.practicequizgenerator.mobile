@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:quiz_generator/screens/auth/login_page.dart';
+import 'package:quiz_generator/screens/home_page.dart';
 import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
 import '../../constant/color.dart';
 import '../../widgets/custom_text.dart';
@@ -29,7 +31,8 @@ class _SplashScreenState extends State<SplashScreen> {
   void route() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const BottomNavbar()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      // MaterialPageRoute(builder: (context) => const BottomNavbar()),
     );
   }
 

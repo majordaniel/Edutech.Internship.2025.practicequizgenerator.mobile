@@ -48,7 +48,7 @@ class QuestionCard extends StatelessWidget {
               color: AppColors.primaryDeepBlack,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           ...List.generate(options.length, (index) {
             return OptionTile(
               text: options[index],

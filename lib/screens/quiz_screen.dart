@@ -117,6 +117,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     final question = quiz.questions[currentIndex];
+    final q = question.question;
     final isAnswered = selectedAnswers[currentIndex] != null;
 
     return Scaffold(
@@ -157,8 +158,10 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
                 const SizedBox(width: 10),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: isAnswered
                         ? Colors.green.withOpacity(0.1)
@@ -184,8 +187,8 @@ class _QuizScreenState extends State<QuizScreen> {
 
             // Question card
             QuestionCard(
-              question: question.question,
-              options: List<String>.from(question.options),
+              question: q,
+              options: question.options,
               selectedIndex: selectedAnswers[currentIndex],
               onOptionSelected: (index) {
                 setState(() {
@@ -215,7 +218,9 @@ class _QuizScreenState extends State<QuizScreen> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 14),
+                        horizontal: 20,
+                        vertical: 14,
+                      ),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -225,7 +230,9 @@ class _QuizScreenState extends State<QuizScreen> {
                         Text(
                           "Prev",
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
                         ),
                       ],
                     ),
@@ -239,7 +246,9 @@ class _QuizScreenState extends State<QuizScreen> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 14),
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
                   ),
                   onPressed: () {
                     if (currentIndex < quiz.questions.length - 1) {
@@ -248,8 +257,9 @@ class _QuizScreenState extends State<QuizScreen> {
                         selectedOption = selectedAnswers[currentIndex];
                       });
                     } else {
-                      final answeredCount =
-                          selectedAnswers.where((a) => a != null).length;
+                      final answeredCount = selectedAnswers
+                          .where((a) => a != null)
+                          .length;
                       final unansweredCount =
                           quiz.questions.length - answeredCount;
                       _showSubmitDialog(
@@ -267,7 +277,9 @@ class _QuizScreenState extends State<QuizScreen> {
                             ? "Next"
                             : "Submit",
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
                       ),
                       const SizedBox(width: 5),
                       Icon(
@@ -360,8 +372,11 @@ class _QuizScreenState extends State<QuizScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.edit_outlined,
-                  color: Color(0xFFFF7A00), size: 40),
+              const Icon(
+                Icons.edit_outlined,
+                color: Color(0xFFFF7A00),
+                size: 40,
+              ),
               const SizedBox(height: 12),
               const Text(
                 "Confirm Submission",
@@ -388,8 +403,10 @@ class _QuizScreenState extends State<QuizScreen> {
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFFF7A00)),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                     ),
                     onPressed: () async {
                       Navigator.pop(ctx);
@@ -397,11 +414,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ReviewQuestionsScreen(
-                            questions: quiz.questions.map((q) => {
-                              'question': q.question,
-                              'options': q.options,
-                              'correctOptionIndex': q.correctIdx,
-                            }).toList(),
+                            questions: quiz.questions,
                             selectedAnswers: selectedAnswers,
                             showAnswered: true,
                           ),
@@ -441,8 +454,10 @@ class _QuizScreenState extends State<QuizScreen> {
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFFF7A00)),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                     ),
                     onPressed: () async {
                       Navigator.pop(ctx);
@@ -450,11 +465,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ReviewQuestionsScreen(
-                            questions: quiz.questions.map((q) => {
-                              'question': q.question,
-                              'options': q.options,
-                              'correctOptionIndex': q.correctIdx,
-                            }).toList(),
+                            questions: quiz.questions,
                             selectedAnswers: selectedAnswers,
                             showAnswered: false,
                           ),
@@ -487,7 +498,8 @@ class _QuizScreenState extends State<QuizScreen> {
                   backgroundColor: const Color(0xFFFF7A00),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: const Text(
@@ -514,9 +526,7 @@ class _QuizScreenState extends State<QuizScreen> {
             color: Color(0xFF2E2E2E),
           ),
         ),
-        content: const Text(
-          "Your responses have been recorded successfully.",
-        ),
+        content: const Text("Your responses have been recorded successfully."),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx),

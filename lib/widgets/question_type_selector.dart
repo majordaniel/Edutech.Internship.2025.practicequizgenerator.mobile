@@ -2,7 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/widgets/custom_text.dart';
 
-enum QuestionType { mcq, theory, mixed, pastQuestions, aiGenerated }
+enum QuestionType {
+  mcq,
+  theory,
+  mixed,
+  pastQuestions,
+  aiGenerated;
+
+  @override
+  String toString() {
+    return switch (this) {
+      mcq => 'MCQ',
+      theory => 'Theory',
+      mixed => 'Mixed',
+      pastQuestions => 'Past Questions',
+      aiGenerated => 'AI Generated',
+    };
+  }
+}
 
 class QuestionTypeSelector extends StatelessWidget {
   final String title;

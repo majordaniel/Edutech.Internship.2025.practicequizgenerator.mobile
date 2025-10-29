@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_generator/models/quiz.dart' show Question;
 import '../constant/color.dart';
 import '../widgets/question_card.dart';
 
 class ReviewQuestionsScreen extends StatefulWidget {
-  final List<Map<String, dynamic>> questions;
+  final List<Question> questions;
   final List<int?> selectedAnswers;
   final bool showAnswered;
 
@@ -58,16 +59,18 @@ class _ReviewQuestionsScreenState extends State<ReviewQuestionsScreen> {
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               itemCount: filteredQuestions.length,
               itemBuilder: (context, index) {
                 final qIndex = filteredQuestions[index];
                 final question = widget.questions[qIndex];
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 20),
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      if (index > 0) SizedBox(height: 20),
                       Text(
                         "Question ${qIndex + 1}",
                         style: const TextStyle(
@@ -76,10 +79,10 @@ class _ReviewQuestionsScreenState extends State<ReviewQuestionsScreen> {
                           color: AppColors.primaryDeepBlack,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(height: 5),
                       QuestionCard(
-                        question: question['question'],
-                        options: List<String>.from(question['options']),
+                        question: question.question,
+                        options: question.options,
                         selectedIndex: selectedAnswers[qIndex],
                         onOptionSelected: (optIndex) {
                           setState(() {

@@ -443,7 +443,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   _showResultDialog(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF7A00),
+                  backgroundColor: AppColors.primaryOrange,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -479,7 +479,7 @@ class _QuizScreenState extends State<QuizScreen> {
               ).push(MaterialPageRoute(builder: (context) => const MockSetupPage()));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF7A00),
+              backgroundColor: AppColors.primaryOrange,
               foregroundColor: Colors.white,
             ),
             child: const Text("Close", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),

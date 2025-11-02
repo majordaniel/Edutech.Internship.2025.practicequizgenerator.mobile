@@ -120,6 +120,10 @@ class _QuizScreenState extends State<QuizScreen> {
     final question = quiz.questions[currentIndex];
     final q = question.question;
     final isAnswered = selectedAnswers[currentIndex] != null;
+    final rs = remainingTime.inSeconds % 60,
+        remSeconds = rs < 10 ? '0$rs' : rs,
+        rm = remainingTime.inMinutes,
+        remMinutes = rm < 10 ? '0$rm' : rm;
 
     return Scaffold(
       backgroundColor: AppColors.primaryWhite,
@@ -134,6 +138,42 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
         ),
         centerTitle: false,
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.horizontal(
+                  left: Radius.circular(13),
+                  right: Radius.circular(13),
+                ),
+                border: Border.all(width: 0.24, color: AppColors.primaryGrey),
+              ),
+              child: SizedBox(
+                width: 69,
+                child: Padding(
+                  padding: const EdgeInsets.all(3.25),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.timer_outlined,
+                        color: AppColors.primaryDeepBlack,
+                      ),
+                      SizedBox(width: 6),
+                      Text(
+                        '$remMinutes:$remSeconds',
+                        style: TextStyle(
+                          color: AppColors.primaryDeepBlack,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

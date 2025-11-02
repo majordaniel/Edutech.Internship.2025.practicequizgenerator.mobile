@@ -385,9 +385,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         groupValue: generateFrom,
                         icon: Image.asset("assets/icons/Vector.png"),
                         onChanged: (value) {
-                          setState(() {
-                            generateFrom = value!;
-                          });
+                          setState(() => generateFrom = value!);
                         },
                       ),
                       const SizedBox(height: 8),
@@ -527,70 +525,84 @@ class _MockSetupPageState extends State<MockSetupPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        bool isLoading = true;
         Quiz? quiz;
         return FutureBuilder(
           future: _loadQuiz(userController.user, genOptions),
           builder: (context, AsyncSnapshot asyncSnapshot) {
             return StatefulBuilder(
               builder: (context, setState) {
-                if (asyncSnapshot.connectionState == ConnectionState.done) {
-                  final data = asyncSnapshot.data as Quiz?;
-                  print('FutureBuilder.data = $data');
-
-                  setState(() {
-                    isLoading = false;
-                    quiz = data;
-                  });
-                }
-
-                return isLoading
-                    ? const CustomDialog(
+                print('async-state: ${asyncSnapshot.connectionState}');
+                switch (asyncSnapshot.connectionState) {
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                    return const CustomDialog(
+                      icon: Icons.hourglass_empty,
+                      iconPath: 'assets/icons/Edit Square.png',
+                      title: "Generating Mock Exam Questions",
+                      message: "Loading.........",
+                    );
+                  case ConnectionState.active:
+                  case ConnectionState.done:
+                    final data = asyncSnapshot.data as Quiz?;
+                    print('FutureBuilder.data = $data');
+                    if (data == null) {
+                      return CustomDialog(
                         icon: Icons.hourglass_empty,
                         iconPath: 'assets/icons/Edit Square.png',
-                        title: "Generating Mock Exam Questions",
-                        message: "Loading.........",
-                      )
-                    : CustomDialog(
-                        icon: Icons.check_circle_outline,
-                        iconPath: 'assets/icons/Edit Square.png',
-                        title: "Mock Quiz Successfully Configured",
-                        message: "Your Quiz Starts in 09:00 sec",
-                        secondaryButtonText: "Review Selections",
-                        primaryButtonText: "Start Quiz",
-                        primaryButtonColor: AppColors.primaryOrange,
-                        primaryBorderColor: AppColors.primaryOrange,
-                        secondaryBorderColor: AppColors.primaryOrange,
-                        // ✅ Add consistent padding inside the dialog
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 18,
-                        ),
-                        // ✅ Properly align buttons at the bottom with spacing
-                        buttonAlignment: MainAxisAlignment.spaceBetween,
-                        onSecondaryPressed: () {
+                        title: 'Error',
+                        message: // TODO: adapt this to different error situations
+                            "That course is currently not in the question bank.\nReport to your mumsy.",
+                        primaryButtonText: 'Ok',
+                        onPrimaryPressed: () {
                           Navigator.pop(context);
                         },
-
-                        onPrimaryPressed: () {
-                          if (quiz is Quiz && mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return QuizScreen(
-                                    quiz: quiz!,
-                                    duration: Duration(
-                                      minutes: minutes,
-                                      seconds: seconds,
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          }
-                        },
                       );
+                    }
+                    setState(() {
+                      quiz = data;
+                    });
+
+                    return CustomDialog(
+                      icon: Icons.check_circle_outline,
+                      iconPath: 'assets/icons/Edit Square.png',
+                      title: "Mock Quiz Successfully Configured",
+                      message: "Your Quiz Starts in 09:00 sec",
+                      secondaryButtonText: "Review Selections",
+                      primaryButtonText: "Start Quiz",
+                      primaryButtonColor: AppColors.primaryOrange,
+                      primaryBorderColor: AppColors.primaryOrange,
+                      secondaryBorderColor: AppColors.primaryOrange,
+                      // ✅ Add consistent padding inside the dialog
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 18,
+                      ),
+                      // ✅ Properly align buttons at the bottom with spacing
+                      buttonAlignment: MainAxisAlignment.spaceBetween,
+                      onSecondaryPressed: () {
+                        Navigator.pop(context);
+                      },
+
+                      onPrimaryPressed: () {
+                        if (quiz is Quiz && mounted) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return QuizScreen(
+                                  quiz: quiz!,
+                                  duration: Duration(
+                                    minutes: minutes,
+                                    seconds: seconds,
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                      },
+                    );
+                }
               },
             );
           },

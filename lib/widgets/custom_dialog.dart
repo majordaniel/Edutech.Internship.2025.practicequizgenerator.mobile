@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../constant/color.dart';
 import 'custom_button.dart';
 import 'custom_text.dart';
@@ -16,7 +17,6 @@ class CustomDialog extends StatelessWidget {
   final VoidCallback? onPrimaryPressed;
   final VoidCallback? onSecondaryPressed;
 
-  // ✅ New fields for layout control
   final EdgeInsetsGeometry? contentPadding;
   final MainAxisAlignment? buttonAlignment;
 
@@ -43,71 +43,87 @@ class CustomDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Padding(
-        // ✅ Use dynamic content padding
-        padding:
-            contentPadding ??
+        padding: contentPadding ??
             const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icon
-            if (icon != null)
-              Icon(icon, size: 50, color: AppColors.primaryOrange)
-            else
-              Image.asset(iconPath, height: 50, width: 50, fit: BoxFit.contain),
-            const SizedBox(height: 16),
+            // SVG Icon
+            Container(
+              height: 60,
+              width: 60,
+              decoration: BoxDecoration(
+                color: AppColors.primaryOrange.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              alignment: Alignment.center,
+              child: icon != null
+                  ? Icon(icon, size: 30, color: AppColors.primaryOrange)
+                  : SvgPicture.asset(
+                      iconPath,
+                      height: 30,
+                      width: 30,
+                      color: AppColors.primaryOrange,
+                    ),
+            ),
+            SizedBox(height: 13),
 
             // Title
-            CustomText(
-              title: title,
-              size: 16,
-              color: AppColors.primaryDeepBlack,
-              fontWeight: FontWeight.w700,
+            Center(
+              child: CustomText(
+                title: title,
+                size: 16,
+                color: AppColors.primaryDeepBlack,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 8),
 
             // Message
-            CustomText(
-              title: message,
-              size: 13,
-              color: AppColors.primaryLightBlack,
-              fontWeight: FontWeight.w500,
+            Center(
+              child: CustomText(
+                title: message,
+                size: 10,
+                color: AppColors.primaryLightBlack,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(height: 20),
 
-            // Buttons Row
-            Row(
-              mainAxisAlignment:
-                  buttonAlignment ?? MainAxisAlignment.end, // ✅ New alignment
+            // ✅ Buttons Row
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
               children: [
                 if (secondaryButtonText != null)
-                  Expanded(
+                  IntrinsicWidth(
                     child: Container(
                       decoration: BoxDecoration(
-                        border: BoxBorder.all(color: (AppColors.primaryOrange)),
-                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(
+                            color: secondaryBorderColor ??
+                                AppColors.primaryOrange),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: CustomButton(
                         buttonTitle: secondaryButtonText!,
                         onTap: onSecondaryPressed ?? () {},
-
                         textColor: AppColors.primaryOrange,
                         buttonColor: Colors.transparent,
                         buttonHeight: 40,
-                        // borderRadius: 3,
+                        borderRadius: 3,
                         textWeight: FontWeight.w600,
                         textSize: 12.6,
+                        isFullWidth: false, // ✅ Add this flag in your button
                       ),
                     ),
                   ),
-                if (secondaryButtonText != null && primaryButtonText != null)
-                  const SizedBox(width: 17),
+
                 if (primaryButtonText != null)
-                  Expanded(
+                  IntrinsicWidth(
                     child: CustomButton(
                       buttonTitle: primaryButtonText!,
                       onTap: onPrimaryPressed ?? () {},
-
                       buttonColor:
                           primaryButtonColor ?? AppColors.primaryOrange,
                       textColor: AppColors.primaryWhite,
@@ -115,6 +131,7 @@ class CustomDialog extends StatelessWidget {
                       borderRadius: 3,
                       textWeight: FontWeight.w600,
                       textSize: 12.6,
+                      isFullWidth: false, // ✅ Add this flag too
                     ),
                   ),
               ],

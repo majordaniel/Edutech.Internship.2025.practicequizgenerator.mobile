@@ -20,6 +20,7 @@ class _MockExamState extends State<MockExam> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primaryWhite,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 40.0),

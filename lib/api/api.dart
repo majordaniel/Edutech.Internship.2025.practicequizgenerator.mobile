@@ -76,10 +76,9 @@ class Api {
     return _api!;
   }
 
-  /// LOGIN: Stores token and refresh token
+  // LOGIN: Stores token and refresh token
   Future<User> login(String email, String password) async {
-    // TODO: the error/exception handling here is very ugly and I hate it
-    // just do something simple like using constants instead of throwing
+
     try {
       final response = await dio
           .post('/Auth/login', data: {'email': email, 'password': password})

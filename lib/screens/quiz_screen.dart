@@ -130,8 +130,8 @@ class _QuizScreenState extends State<QuizScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.primaryWhite,
         elevation: 0,
-        title: Text(
-          widget.quiz.courseTitle,
+        title: const Text(
+          "Data Science Practice Quiz",
           style: TextStyle(
             color: AppColors.primaryDeepBlack,
             fontWeight: FontWeight.bold,
@@ -415,7 +415,7 @@ class _QuizScreenState extends State<QuizScreen> {
             children: [
               const Icon(
                 Icons.edit_outlined,
-                color: Color(0xFFFF7A00),
+                color: AppColors.primaryOrange,
                 size: 40,
               ),
               const SizedBox(height: 12),
@@ -424,14 +424,14 @@ class _QuizScreenState extends State<QuizScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF2E2E2E),
+                  color: AppColors.primaryDeepBlack,
                 ),
               ),
               const SizedBox(height: 20),
 
               // ✅ Answered
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
                     "Answered Questions: $answered",
@@ -443,10 +443,13 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFFF7A00)),
+                      side: const BorderSide(color: AppColors.primaryOrange),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 4,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2.19),
                       ),
                     ),
                     onPressed: () async {
@@ -469,7 +472,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     child: const Text(
                       "Review Question",
                       style: TextStyle(
-                        color: Color(0xFFFF7A00),
+                        color: AppColors.primaryOrange,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -482,7 +485,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
               // ❌ Unanswered
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
                     "Unanswered Questions: $unanswered",
@@ -494,10 +497,13 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFFF7A00)),
+                      side: const BorderSide(color: AppColors.primaryOrange),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 4,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2.19),
                       ),
                     ),
                     onPressed: () async {
@@ -520,7 +526,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     child: const Text(
                       "Review Question",
                       style: TextStyle(
-                        color: Color(0xFFFF7A00),
+                        color: AppColors.primaryOrange,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -539,9 +545,12 @@ class _QuizScreenState extends State<QuizScreen> {
                   backgroundColor: AppColors.primaryOrange,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(2.19),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 17.51,
+                    vertical: 8.76,
+                  ),
                 ),
                 child: const Text(
                   "Submit",
@@ -559,30 +568,32 @@ class _QuizScreenState extends State<QuizScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.19)),
         title: const Text(
-          "Quiz Submitted!",
+          "Mock Quiz Successfully Submitted",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Color(0xFF2E2E2E),
           ),
         ),
-        content: const Text("Your responses have been recorded successfully."),
+        content: const Text("Mock quiz completed"),
         actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const MockSetupPage()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryOrange,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text(
-              "Close",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const MockSetupPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryOrange,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text(
+                "View Result",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
             ),
           ),
         ],

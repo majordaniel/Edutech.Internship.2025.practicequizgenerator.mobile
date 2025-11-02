@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:file_picker/file_picker.dart'
     show FilePicker, FilePickerResult, FileType;
 import 'package:flutter/material.dart';
@@ -140,10 +139,10 @@ class _MockSetupPageState extends State<MockSetupPage> {
                               CustomButton(
                                 buttonTitle: "Program",
                                 textColor: AppColors.primaryWhite,
-                                textWeight: FontWeight.w500,
-                                textSize: 12.6,
-                                buttonHeight: 21.3,
-                                buttonWidth: 73.9,
+                                textWeight: FontWeight.w900,
+                                textSize: 10,
+                                buttonHeight: 25.3,
+                                isFullWidth: false,
                                 borderRadius: 12.06,
                               ),
                               const SizedBox(width: 8),
@@ -157,13 +156,11 @@ class _MockSetupPageState extends State<MockSetupPage> {
                           ),
                           CustomButton(
                             buttonTitle: "Generate",
-                            buttonColor: Colors.deepOrange,
                             textColor: AppColors.primaryWhite,
-
                             textWeight: FontWeight.w900,
-                            textSize: 16,
-                            buttonHeight: 50.3,
-                            buttonWidth: 90,
+                            textSize: 10,
+                            buttonHeight: 25.3,
+                            isFullWidth: false,
                             borderRadius: 12.06,
                             onTap: () async {
                               if (selectCourseId != null && context.mounted) {
@@ -572,12 +569,12 @@ class _MockSetupPageState extends State<MockSetupPage> {
                       primaryButtonColor: AppColors.primaryOrange,
                       primaryBorderColor: AppColors.primaryOrange,
                       secondaryBorderColor: AppColors.primaryOrange,
-                      // ✅ Add consistent padding inside the dialog
+                      // Add consistent padding inside the dialog
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 18,
                       ),
-                      // ✅ Properly align buttons at the bottom with spacing
+                      // Properly align buttons at the bottom with spacing
                       buttonAlignment: MainAxisAlignment.spaceBetween,
                       onSecondaryPressed: () {
                         Navigator.pop(context);

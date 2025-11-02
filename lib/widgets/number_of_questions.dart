@@ -47,47 +47,48 @@ class _CompactNumberSpinnerState extends State<CompactNumberSpinner> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // height: 56,
-      // width: double.infinity,
+      height: 56,
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.primaryGrey),
         borderRadius: BorderRadius.circular(8),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Number text
-          CustomText(
-            title: value.toString().padLeft(2, '0'),
-            size: 16,
-            color: AppColors.primaryLightBlack,
-            fontWeight: FontWeight.w400,
-          ),
-
-          // Vertical arrows column
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: _increment,
-                child: Icon(
-                  Icons.keyboard_arrow_up,
-                  size: 24,
-                  color: AppColors.primaryLightBlack,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Number text
+            CustomText(
+              title: value.toString().padLeft(2, '0'),
+              size: 16,
+              color: AppColors.primaryLightBlack,
+              fontWeight: FontWeight.w400,
+            ),
+      
+            // Vertical arrows column
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: _increment,
+                  child: Icon(
+                    Icons.keyboard_arrow_up,
+                    size: 24,
+                    color: AppColors.primaryLightBlack,
+                  ),
                 ),
-              ),
-              GestureDetector(
-                onTap: _decrement,
-                child: Icon(
-                  Icons.keyboard_arrow_down,
-                  size: 24,
-                  color: AppColors.primaryLightBlack,
+                GestureDetector(
+                  onTap: _decrement,
+                  child: Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 24,
+                    color: AppColors.primaryLightBlack,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

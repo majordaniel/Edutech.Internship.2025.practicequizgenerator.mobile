@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_generator/screens/auth/login_page.dart';
+import 'package:quiz_generator/screens/contact_page.dart';
+import 'package:quiz_generator/screens/profile_page.dart';
+import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
 import 'package:quiz_generator/widgets/custom_button.dart';
 import '../constant/color.dart';
 import '../widgets/custom_card_tile.dart';
@@ -16,6 +20,7 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primaryWhite,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -37,16 +42,17 @@ class _AccountPageState extends State<AccountPage> {
                               size: 20,
                             ),
                             onPressed: () {
-                              Navigator.pop(context);
+                              // Navigator.pop(context);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const BottomNavbar(),
+                                ),
+                              );
                             },
                           ),
                           const SizedBox(width: 5),
                           const Spacer(),
-                          Icon(
-                            Icons.notifications_none,
-                            color: AppColors.primaryBlack,
-                            size: 24.0,
-                          ),
                         ],
                       ),
                       CustomText(
@@ -65,74 +71,87 @@ class _AccountPageState extends State<AccountPage> {
                       SizedBox(height: 24.0),
                       CustomCardTile(
                         title: "My Profile",
-                        iconPath: 'assets/icons/Union.png',
+                        iconPath: 'assets/icons/svg/Add User.svg',
                         onTap: () {
-                          // navigate or perform action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return ProfilePage();
+                              },
+                            ),
+                          );
                         },
                       ),
 
                       SizedBox(height: 8.0),
                       CustomCardTile(
                         title: "Contact Us",
-                        iconPath: 'assets/icons/Union.png',
+                        iconPath: 'assets/icons/svg/Chat.svg',
                         onTap: () {
-                          // navigate or perform action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return ContactPage();
+                              },
+                            ),
+                          );
                         },
                       ),
 
                       SizedBox(height: 24.0),
 
                       CustomButton(
-                        image: Image.asset(
-                          "assets/icons/Logout.png",
-                          color: AppColors.primaryWhite,
-                        ),
+                        iconPath:
+                            "assets/icons/svg/Logout.svg", // Use SVG icon instead of Image.asset
+                        iconColor: AppColors.primaryWhite,
                         buttonTitle: "Sign Out",
                         textColor: AppColors.primaryWhite,
                         textWeight: FontWeight.w600,
                         textSize: 16,
                         buttonHeight: 44,
+                        borderRadius: 8,
                         onTap: () {
-                          CustomDialog(
-                            icon: Icons.check_circle_outline,
-                            iconPath: 'assets/icons/Edit Square.png',
-                            title: "Signing Out",
-                            message:
-                                "Are you sure you want to sign out from Exam Portal?",
-                            secondaryButtonText: "Not Yet",
-                            primaryButtonText: "Sign Out",
-                            primaryButtonColor: AppColors.primaryOrange,
-                            primaryBorderColor: AppColors.primaryOrange,
-                            secondaryBorderColor: AppColors.primaryOrange,
-                            // ✅ Add consistent padding inside the dialog
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 18,
-                            ),
-                            // ✅ Properly align buttons at the bottom with spacing
-                            buttonAlignment: MainAxisAlignment.spaceBetween,
-                            onSecondaryPressed: () {
-                              Navigator.pop(context);
-                            },
+                          showDialog(
+                            context: context,
+                            builder: (context) => CustomDialog(
+                              // Remove the Flutter icon so SVG path is used instead
+                              iconPath: 'assets/icons/svg/Edit Square.svg',
 
-                            // onPrimaryPressed: () {
-                            //   if (mounted) {
-                            //     Navigator.push(
-                            //       context,
-                            //       MaterialPageRoute(
-                            //         builder: (context) {
-                            //           return QuizScreen(
-                            //             quiz: quiz!,
-                            //             duration: Duration(
-                            //               minutes: minutes,
-                            //               seconds: seconds,
-                            //             ),
-                            //           );
-                            //         },
-                            //       ),
-                            //     );
-                            //   }
-                            // },
+                              // Dialog Content
+                              title: "Signing Out",
+                              message:
+                                  "Are you sure you want to sign out from Exam Portal?",
+
+                              // Buttons
+                              secondaryButtonText: "Not Yet",
+                              primaryButtonText: "Sign Out",
+                              primaryButtonColor: AppColors.primaryOrange,
+                              primaryBorderColor: AppColors.primaryOrange,
+                              secondaryBorderColor: AppColors.primaryOrange,
+
+                              // Layout
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 18,
+                              ),
+                              buttonAlignment: MainAxisAlignment.spaceBetween,
+
+                              // Actions
+                              onSecondaryPressed: () {
+                                Navigator.pop(context);
+                              },
+                              onPrimaryPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginPage(),
+                                  ),
+                                );
+                              },
+                            ),
                           );
                         },
                       ),

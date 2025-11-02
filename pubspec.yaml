@@ -60,6 +60,7 @@ flutter:
   assets:
     - assets/favicon/
     - assets/icons/
+    - assets/icons/svg/
     - assets/images/
     # flutter_dotenv package requires whichever .env (or any such file) be made an
     # asset here, so that I will show up in the app's private storage

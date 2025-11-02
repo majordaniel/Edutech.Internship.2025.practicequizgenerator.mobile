@@ -34,14 +34,14 @@ enum QuestionSource {
 }
 
 class QuestionGenerateOptions {
-  final courseId =
-      'e7a9b6d8-0c2c-4a68-a777-4cd5aa3b68ad'; // Intro to Programming
+  final String courseId;
   final QuestionSource qSource;
   final int timer = 6969;
   final QuestionType qType;
   final int numQuestions;
 
   QuestionGenerateOptions({
+    required this.courseId,
     required this.qType,
     required this.qSource,
     required this.numQuestions,
@@ -67,7 +67,7 @@ class MockSetupPage extends StatefulWidget {
 
 class _MockSetupPageState extends State<MockSetupPage> {
   int seconds = 0, minutes = 5;
-  String? selectedValue;
+  String? selectCourseId;
   int numberOfQuestions = 16;
   QuestionType selectedType = QuestionType.mcq;
   QuestionType generateFrom = QuestionType.aiGenerated;
@@ -157,7 +157,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                             buttonWidth: 90,
                             borderRadius: 12.06,
                             onTap: () async {
-                              if (context.mounted) {
+                              if (selectCourseId != null && context.mounted) {
                                 _generateQuestions(
                                   context,
                                   numberOfQuestions,
@@ -177,12 +177,11 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         fontWeight: FontWeight.w600,
                       ),
                       const SizedBox(height: 10),
-
                       FutureBuilder(
                         future: courses,
                         initialData: [Course('4444', title: 'A Darned Course')],
                         builder: (context, asyncSnapshot) {
-                          var courses = [
+                          var dropdownItems = [
                             DropdownMenuItem(child: Text('Error')),
                           ];
 
@@ -197,7 +196,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                                 'FutureBuilder/dropdown: error: ${asyncSnapshot.error}',
                               );
                             } else {
-                              courses = asyncSnapshot.data!
+                              dropdownItems = asyncSnapshot.data!
                                   .map(
                                     (course) => DropdownMenuItem(
                                       value: course.title,
@@ -214,13 +213,20 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
                             return DropdownButtonFormField(
                               dropdownColor: AppColors.primaryWhite,
-                              initialValue: selectedValue,
+                              // initialValue: selectCourseId,
                               icon: const Icon(Icons.keyboard_arrow_down),
-                              items: courses,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedValue = value;
-                                });
+                              items: dropdownItems,
+                              onChanged: (course) async {
+                                for (final c in (await courses)) {
+                                  if (c.title == course) {
+                                    setState(() {
+                                      print(
+                                        'course changed to "$course:${c.id}"',
+                                      );
+                                      selectCourseId = c.id;
+                                    });
+                                  }
+                                }
                               },
                               decoration: InputDecoration(
                                 hintText: 'Choose a course from your program',
@@ -235,9 +241,9 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
                           return DropdownButtonFormField(
                             dropdownColor: AppColors.primaryWhite,
-                            initialValue: selectedValue,
+                            initialValue: selectCourseId,
                             icon: const Icon(Icons.keyboard_arrow_down),
-                            items: courses,
+                            items: dropdownItems,
                             onChanged: (_) => (),
                           );
                         },
@@ -409,7 +415,35 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
   }
 
-  Future<Quiz?> loadQuiz(User user, QuestionGenerateOptions options) async {
+  Future<Quiz?> loadQuizFromQuestionBank(
+    String courseId,
+    QuestionGenerateOptions opts,
+  ) async {
+    print('LoadQuizFromQuestionBank: to load for "$courseId');
+    try {
+      final questions = await questionBank.fetchById(
+        courseId,
+        opts.numQuestions,
+      );
+      if (questions == null) {
+        print(
+          'LoadQuizFromQuestionBank/error: $courseId does not have questions here',
+        );
+        return null;
+      }
+      print('loaded $questions from question bank');
+
+      return Quiz.fromQuestions(4444, questions);
+    } on Object catch (e) {
+      print('LoadQuizFromQuestionBank/error: $e');
+      rethrow;
+    }
+  }
+
+  Future<Quiz?> loadQuizFromFileUpload(
+    User user,
+    QuestionGenerateOptions options,
+  ) async {
     var opts = options.toJson();
     opts['UserId'] = user.id;
 
@@ -459,6 +493,21 @@ class _MockSetupPageState extends State<MockSetupPage> {
     throw 'Invalid form from server: $data';
   }
 
+  Future<Quiz?> _loadQuiz(User user, QuestionGenerateOptions options) async {
+    try {
+      if (options.qSource == QuestionSource.questionBank) {
+        // TODO: pass course id to loadQuizFromFileUpload()
+
+        return await loadQuizFromQuestionBank(selectCourseId!, options);
+      }
+
+      return await loadQuizFromFileUpload(user, options);
+    } on Object catch (e) {
+      print('Load quiz error: $e');
+      return null;
+    }
+  }
+
   Future<dynamic> _generateQuestions(
     BuildContext context,
     int numQuestions,
@@ -466,6 +515,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
     QuestionType generateFrom,
   ) {
     final genOptions = QuestionGenerateOptions(
+      courseId: selectCourseId!,
       qType: questionType,
       numQuestions: numQuestions,
       qSource: generateFrom == QuestionType.aiGenerated
@@ -480,7 +530,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
         bool isLoading = true;
         Quiz? quiz;
         return FutureBuilder(
-          future: loadQuiz(userController.user, genOptions),
+          future: _loadQuiz(userController.user, genOptions),
           builder: (context, AsyncSnapshot asyncSnapshot) {
             return StatefulBuilder(
               builder: (context, setState) {

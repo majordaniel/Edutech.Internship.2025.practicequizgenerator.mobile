@@ -24,9 +24,7 @@ class DashboardCard extends StatelessWidget {
       child: Card(
         elevation: 2,
         color: AppColors.primaryWhite,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -57,10 +55,7 @@ class DashboardCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       color: iconBgColor,
                     ),
-                    child: ImageIcon(
-                      AssetImage(iconPath),
-                      color: iconColor,
-                    ),
+                    child: ImageIcon(AssetImage(iconPath), color: iconColor),
                   ),
                 ],
               ),

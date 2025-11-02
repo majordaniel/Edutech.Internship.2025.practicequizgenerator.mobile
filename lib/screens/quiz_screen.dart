@@ -128,7 +128,10 @@ class _QuizScreenState extends State<QuizScreen> {
         elevation: 0,
         title: const Text(
           "Data Science Practice Quiz",
-          style: TextStyle(color: AppColors.primaryDeepBlack, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: AppColors.primaryDeepBlack,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: false,
       ),
@@ -137,7 +140,9 @@ class _QuizScreenState extends State<QuizScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            QuizProgressBar(progress: selectedAnswers.whereType<int>().length / quiz.length),
+            QuizProgressBar(
+              progress: selectedAnswers.whereType<int>().length / quiz.length,
+            ),
             const SizedBox(height: 24),
 
             // Question header + badge
@@ -154,11 +159,19 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
                 const SizedBox(width: 10),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: isAnswered ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                    color: isAnswered
+                        ? Colors.green.withOpacity(0.1)
+                        : Colors.red.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: isAnswered ? Colors.green : Colors.red, width: 0.8),
+                    border: Border.all(
+                      color: isAnswered ? Colors.green : Colors.red,
+                      width: 0.8,
+                    ),
                   ),
                   child: Text(
                     isAnswered ? "Answered" : "Unanswered",
@@ -202,15 +215,26 @@ class _QuizScreenState extends State<QuizScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryLightBlack,
                       foregroundColor: AppColors.primaryWhite,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 14,
+                      ),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.arrow_back_ios_new, size: 18),
                         SizedBox(width: 6),
-                        Text("Prev", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        Text(
+                          "Prev",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -219,8 +243,13 @@ class _QuizScreenState extends State<QuizScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryOrange,
                     foregroundColor: AppColors.primaryWhite,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
                   ),
                   onPressed: () {
                     if (currentIndex < quiz.questions.length - 1) {
@@ -229,17 +258,29 @@ class _QuizScreenState extends State<QuizScreen> {
                         selectedOption = selectedAnswers[currentIndex];
                       });
                     } else {
-                      final answeredCount = selectedAnswers.where((a) => a != null).length;
-                      final unansweredCount = quiz.questions.length - answeredCount;
-                      _showSubmitDialog(context, answeredCount, unansweredCount);
+                      final answeredCount = selectedAnswers
+                          .where((a) => a != null)
+                          .length;
+                      final unansweredCount =
+                          quiz.questions.length - answeredCount;
+                      _showSubmitDialog(
+                        context,
+                        answeredCount,
+                        unansweredCount,
+                      );
                     }
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        currentIndex < quiz.questions.length - 1 ? "Next" : "Submit",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        currentIndex < quiz.questions.length - 1
+                            ? "Next"
+                            : "Submit",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
                       ),
                       const SizedBox(width: 5),
                       Icon(
@@ -293,7 +334,9 @@ class _QuizScreenState extends State<QuizScreen> {
                           height: 40,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: isAnswered ? AppColors.primaryOrange : Colors.transparent,
+                            color: isAnswered
+                                ? AppColors.primaryOrange
+                                : Colors.transparent,
                             border: Border.all(color: AppColors.primaryGrey),
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -330,7 +373,11 @@ class _QuizScreenState extends State<QuizScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.edit_outlined, color: Color(0xFFFF7A00), size: 40),
+              const Icon(
+                Icons.edit_outlined,
+                color: Color(0xFFFF7A00),
+                size: 40,
+              ),
               const SizedBox(height: 12),
               const Text(
                 "Confirm Submission",
@@ -357,7 +404,10 @@ class _QuizScreenState extends State<QuizScreen> {
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFFF7A00)),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                     ),
                     onPressed: () async {
                       Navigator.pop(ctx);
@@ -405,7 +455,10 @@ class _QuizScreenState extends State<QuizScreen> {
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFFF7A00)),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                     ),
                     onPressed: () async {
                       Navigator.pop(ctx);
@@ -445,7 +498,9 @@ class _QuizScreenState extends State<QuizScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryOrange,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: const Text(
@@ -467,22 +522,28 @@ class _QuizScreenState extends State<QuizScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
           "Quiz Submitted!",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E2E2E)),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2E2E2E),
+          ),
         ),
         content: const Text("Your responses have been recorded successfully."),
         actions: [
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (context) => const MockSetupPage()));
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const MockSetupPage()),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryOrange,
               foregroundColor: Colors.white,
             ),
-            child: const Text("Close", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            child: const Text(
+              "Close",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
           ),
         ],
       ),

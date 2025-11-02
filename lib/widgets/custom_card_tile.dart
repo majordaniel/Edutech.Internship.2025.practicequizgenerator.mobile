@@ -25,9 +25,7 @@ class CustomCardTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         color: backgroundColor ?? AppColors.primaryWhite,
         elevation: 2,
         shadowColor: Colors.black12,

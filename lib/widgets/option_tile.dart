@@ -36,9 +36,7 @@ class OptionTile extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              isSelected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_off,
+              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
               color: isSelected
                   ? AppColors.primaryOrange
                   : AppColors.primaryLightBlack,

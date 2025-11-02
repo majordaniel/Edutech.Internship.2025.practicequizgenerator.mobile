@@ -26,15 +26,18 @@ class QuestionNavigator extends StatelessWidget {
             height: 36,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isCurrent ? AppColors.primaryOrange : AppColors.primaryWhite,
+              color: isCurrent
+                  ? AppColors.primaryOrange
+                  : AppColors.primaryWhite,
               border: Border.all(color: AppColors.primaryGrey),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               "${index + 1}",
               style: TextStyle(
-                color:
-                    isCurrent ? AppColors.primaryWhite : AppColors.primaryDeepBlack,
+                color: isCurrent
+                    ? AppColors.primaryWhite
+                    : AppColors.primaryDeepBlack,
                 fontWeight: FontWeight.w600,
               ),
             ),

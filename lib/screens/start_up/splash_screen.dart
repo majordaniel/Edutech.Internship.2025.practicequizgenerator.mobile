@@ -6,7 +6,6 @@ import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
 import '../../constant/color.dart';
 import '../../widgets/custom_text.dart';
 
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 

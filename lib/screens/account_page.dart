@@ -94,45 +94,46 @@ class _AccountPageState extends State<AccountPage> {
                         buttonHeight: 44,
                         onTap: () {
                           CustomDialog(
-                    icon: Icons.check_circle_outline,
-                    iconPath: 'assets/icons/Edit Square.png',
-                    title: "Signing Out",
-                    message: "Are you sure you want to sign out from Exam Portal?",
-                    secondaryButtonText: "Not Yet",
-                    primaryButtonText: "Sign Out",
-                    primaryButtonColor: AppColors.primaryOrange,
-                    primaryBorderColor: AppColors.primaryOrange,
-                    secondaryBorderColor: AppColors.primaryOrange,
-                    // ✅ Add consistent padding inside the dialog
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 18,
-                    ),
-                    // ✅ Properly align buttons at the bottom with spacing
-                    buttonAlignment: MainAxisAlignment.spaceBetween,
-                    onSecondaryPressed: () {
-                      Navigator.pop(context);
-                    },
+                            icon: Icons.check_circle_outline,
+                            iconPath: 'assets/icons/Edit Square.png',
+                            title: "Signing Out",
+                            message:
+                                "Are you sure you want to sign out from Exam Portal?",
+                            secondaryButtonText: "Not Yet",
+                            primaryButtonText: "Sign Out",
+                            primaryButtonColor: AppColors.primaryOrange,
+                            primaryBorderColor: AppColors.primaryOrange,
+                            secondaryBorderColor: AppColors.primaryOrange,
+                            // ✅ Add consistent padding inside the dialog
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 18,
+                            ),
+                            // ✅ Properly align buttons at the bottom with spacing
+                            buttonAlignment: MainAxisAlignment.spaceBetween,
+                            onSecondaryPressed: () {
+                              Navigator.pop(context);
+                            },
 
-                    // onPrimaryPressed: () {
-                    //   if (mounted) {
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (context) {
-                    //           return QuizScreen(
-                    //             quiz: quiz!,
-                    //             duration: Duration(
-                    //               minutes: minutes,
-                    //               seconds: seconds,
-                    //             ),
-                    //           );
-                    //         },
-                    //       ),
-                    //     );
-                    //   }
-                    // },
-                  );
+                            // onPrimaryPressed: () {
+                            //   if (mounted) {
+                            //     Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(
+                            //         builder: (context) {
+                            //           return QuizScreen(
+                            //             quiz: quiz!,
+                            //             duration: Duration(
+                            //               minutes: minutes,
+                            //               seconds: seconds,
+                            //             ),
+                            //           );
+                            //         },
+                            //       ),
+                            //     );
+                            //   }
+                            // },
+                          );
                         },
                       ),
                     ],

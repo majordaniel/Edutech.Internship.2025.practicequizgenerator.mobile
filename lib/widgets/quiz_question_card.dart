@@ -82,52 +82,52 @@ class QuestionCard extends StatelessWidget {
           const SizedBox(height: 12),
           // Options List
           Column(
-            children: List.generate(
-              options.length,
-              (index) {
-                final isSelected = selectedOptionIndex == index;
-                return GestureDetector(
-                  onTap: onOptionSelected != null
-                      ? () => onOptionSelected!(index)
-                      : null,
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: isSelected
-                            ? Colors.orange
-                            : const Color(0xFFE0E0E0),
-                      ),
-                      color: Colors.white,
+            children: List.generate(options.length, (index) {
+              final isSelected = selectedOptionIndex == index;
+              return GestureDetector(
+                onTap: onOptionSelected != null
+                    ? () => onOptionSelected!(index)
+                    : null,
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSelected
+                          ? Colors.orange
+                          : const Color(0xFFE0E0E0),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          isSelected
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_off,
-                          color: isSelected ? Colors.orange : Colors.grey,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            options[index],
-                            style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  isSelected ? Colors.orange[900] : Colors.black,
-                            ),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
+                        color: isSelected ? Colors.orange : Colors.grey,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          options[index],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isSelected
+                                ? Colors.orange[900]
+                                : Colors.black,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            }),
           ),
         ],
       ),

@@ -96,7 +96,7 @@ class CustomDialog extends StatelessWidget {
                         buttonHeight: 40,
                         // borderRadius: 3,
                         textWeight: FontWeight.w600,
-                        textSize: 12.6, 
+                        textSize: 12.6,
                       ),
                     ),
                   ),

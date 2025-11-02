@@ -49,13 +49,10 @@ class CustomButton extends StatelessWidget {
           mainAxisAlignment: alignment == Alignment.centerLeft
               ? MainAxisAlignment.start
               : alignment == Alignment.centerRight
-                  ? MainAxisAlignment.end
-                  : MainAxisAlignment.center,
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.center,
           children: [
-            if (image != null) ...[
-              image!,
-              const SizedBox(width: 8),
-            ],
+            if (image != null) ...[image!, const SizedBox(width: 8)],
             CustomText(
               title: buttonTitle,
               size: textSize,

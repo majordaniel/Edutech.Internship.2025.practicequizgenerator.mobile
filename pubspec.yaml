@@ -2,7 +2,7 @@ name: quiz_generator
 description: "EduTech Quiz Generator app"
 publish_to: 'none'
 
-version: 0.1.1
+version: 0.1.13
 
 environment:
   sdk: ">=3.9.2 <4.0.0"

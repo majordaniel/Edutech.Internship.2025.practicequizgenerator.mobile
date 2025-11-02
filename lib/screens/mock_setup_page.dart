@@ -9,6 +9,7 @@ import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/constant/color.dart';
 import 'package:quiz_generator/helper/helper.dart';
 import 'package:quiz_generator/main.dart';
+import 'package:quiz_generator/models/course.dart';
 import 'package:quiz_generator/models/quiz.dart';
 import 'package:quiz_generator/models/user.dart' show User;
 import 'package:quiz_generator/screens/quiz_screen.dart';
@@ -65,19 +66,19 @@ class MockSetupPage extends StatefulWidget {
 }
 
 class _MockSetupPageState extends State<MockSetupPage> {
-  final List<String> items = [
-    'Computer Science',
-    'Discrete Mathematics',
-    'Linear Algebra',
-    'Information Technology',
-    'Algorithm Design',
-  ];
-
   int seconds = 0, minutes = 5;
   String? selectedValue;
   int numberOfQuestions = 16;
   QuestionType selectedType = QuestionType.mcq;
   QuestionType generateFrom = QuestionType.aiGenerated;
+  Future<List<Course>> courses = Future.value([]);
+
+  @override
+  void initState() {
+    super.initState();
+    // try to fetch the courses before loading the screen
+    courses = userController.courses();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,36 +177,70 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         fontWeight: FontWeight.w600,
                       ),
                       const SizedBox(height: 10),
-                      DropdownButtonFormField(
-                        dropdownColor: AppColors.primaryWhite,
-                        initialValue: selectedValue,
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: items
-                            .map(
-                              (method) => DropdownMenuItem(
-                                value: method,
-                                child: CustomText(
-                                  title: method,
-                                  size: 16,
-                                  color: AppColors.primaryDeepBlack,
-                                  fontWeight: FontWeight.w500,
-                                ),
+
+                      FutureBuilder(
+                        future: courses,
+                        initialData: [Course('4444', title: 'A Darned Course')],
+                        builder: (context, asyncSnapshot) {
+                          var courses = [
+                            DropdownMenuItem(child: Text('Error')),
+                          ];
+
+                          if (asyncSnapshot.connectionState ==
+                              ConnectionState.done) {
+                            print(
+                              'FutureBuilder/dropdown: ${asyncSnapshot.data}',
+                            );
+
+                            if (asyncSnapshot.data == null) {
+                              print(
+                                'FutureBuilder/dropdown: error: ${asyncSnapshot.error}',
+                              );
+                            } else {
+                              courses = asyncSnapshot.data!
+                                  .map(
+                                    (course) => DropdownMenuItem(
+                                      value: course.title,
+                                      child: CustomText(
+                                        title: course.title,
+                                        size: 16,
+                                        color: AppColors.primaryDeepBlack,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  )
+                                  .toList(growable: false);
+                            }
+
+                            return DropdownButtonFormField(
+                              dropdownColor: AppColors.primaryWhite,
+                              initialValue: selectedValue,
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              items: courses,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedValue = value;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Choose a course from your program',
+                                hintStyle: Helper.hintStyle,
+                                border: Helper.decoration,
+                                focusedBorder: Helper.decoration,
+                                filled: true,
+                                fillColor: Colors.transparent,
                               ),
-                            )
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedValue = value;
-                          });
+                            );
+                          }
+
+                          return DropdownButtonFormField(
+                            dropdownColor: AppColors.primaryWhite,
+                            initialValue: selectedValue,
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            items: courses,
+                            onChanged: (_) => (),
+                          );
                         },
-                        decoration: InputDecoration(
-                          hintText: 'Choose a course from your program',
-                          hintStyle: Helper.hintStyle,
-                          border: Helper.decoration,
-                          focusedBorder: Helper.decoration,
-                          filled: true,
-                          fillColor: Colors.transparent,
-                        ),
                       ),
                       const SizedBox(height: 16),
 

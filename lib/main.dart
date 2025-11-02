@@ -10,7 +10,10 @@ import 'api/api.dart';
 
 late final Api api;
 
-final userController = UserController(User('Janet Jane Jones', 'jjj@ccmail.com'));
+final userController = UserController(
+  User('Janet Jane Jones', 'jjj@ccmail.com'),
+  api,
+);
 final PlatformApi platformApi = Platform.isAndroid
     ? AndroidApi()
     : throw "iOS is unimplemented";

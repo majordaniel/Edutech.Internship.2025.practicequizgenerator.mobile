@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart' show BaseOptions, Dio, DioException;
+import 'package:dio/src/response.dart';
+import 'package:quiz_generator/models/course.dart';
 import 'package:quiz_generator/models/user.dart' show User;
 
 bool _initialised = false;
@@ -140,6 +142,60 @@ class Api {
         }
       }
       throw ApiRequestError('Unauthorized/User/email: Invalid credentials');
+    } on DioException catch (e) {
+      throw ApiRequestError('Network error: ${e.message}');
+    }
+  }
+
+  Future<List<Course>> fetchUserCourse(String id) async {
+    // TODO: verify id
+    final response = await _responseOrThrow(
+      dio.get('/StudentCourse/$id'),
+      'Unauthorized/StudentCourse: Invalid id: $id',
+    );
+    if (response.succeeded && response.data != null) {
+      if (response.data case {
+        'studentId': _, // TODO: verify against `id`
+        'courses': List courses,
+      }) {
+        return courses
+            .map(
+              (maybeCourse) => switch (maybeCourse) {
+                {
+                  'id': String courseId,
+                  'title': String courseTitle,
+                  // 'code': _,
+                  // 'creditUnit': _,
+                  // 'semester': _,
+                } =>
+                  Course(courseId, title: courseTitle),
+                _ => throw ApiRequestError(
+                  'Internal: Response data format not matched: <$maybeCourse\n${response.data}>',
+                ),
+              },
+            )
+            .toList(growable: false);
+      }
+    }
+
+    throw 'fetchUser: ${response.message}';
+  }
+
+  Future<ApiResponse> _responseOrThrow(
+    Future<Response> dioFuture,
+    String throwMessage,
+  ) async {
+    try {
+      final response = await dioFuture;
+      if (response.statusCode == 200) {
+        final r = ApiResponse.fromHttpResponse(response.data);
+        if (r == null) {
+          throw ApiRequestError('Http error');
+        }
+
+        return r;
+      }
+      throw ApiRequestError(throwMessage);
     } on DioException catch (e) {
       throw ApiRequestError('Network error: ${e.message}');
     }

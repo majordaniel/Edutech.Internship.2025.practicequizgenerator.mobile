@@ -126,8 +126,8 @@ class _QuizScreenState extends State<QuizScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.primaryWhite,
         elevation: 0,
-        title: const Text(
-          "Data Science Practice Quiz",
+        title: Text(
+          widget.quiz.courseTitle,
           style: TextStyle(
             color: AppColors.primaryDeepBlack,
             fontWeight: FontWeight.bold,

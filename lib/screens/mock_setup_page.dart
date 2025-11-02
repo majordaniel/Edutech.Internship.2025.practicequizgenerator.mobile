@@ -80,6 +80,15 @@ class _MockSetupPageState extends State<MockSetupPage> {
     courses = userController.courses();
   }
 
+  Future<String?> _courseTitle(String courseId) async {
+    for (final course in await courses) {
+      if (course.id == courseId) {
+        return course.title;
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -423,7 +432,8 @@ class _MockSetupPageState extends State<MockSetupPage> {
       }
       print('loaded $questions from question bank');
 
-      return Quiz.fromQuestions(4444, questions);
+      final courseTitle = await _courseTitle(courseId);
+      return Quiz.fromQuestions(4444, courseTitle!, questions);
     } on Object catch (e) {
       print('LoadQuizFromQuestionBank/error: $e');
       rethrow;
@@ -432,6 +442,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
 
   Future<Quiz?> loadQuizFromFileUpload(
     User user,
+    String courseId,
     QuestionGenerateOptions options,
   ) async {
     var opts = options.toJson();
@@ -476,7 +487,8 @@ class _MockSetupPageState extends State<MockSetupPage> {
         'quizId': String? quizId,
         'questions': List<dynamic> questions,
       }) {
-        var quiz = Quiz.fromList(66, questions);
+        final courseTitle = await _courseTitle(courseId);
+        var quiz = Quiz.fromList(66, courseTitle!, questions);
         return quiz;
       }
     }
@@ -486,12 +498,10 @@ class _MockSetupPageState extends State<MockSetupPage> {
   Future<Quiz?> _loadQuiz(User user, QuestionGenerateOptions options) async {
     try {
       if (options.qSource == QuestionSource.questionBank) {
-        // TODO: pass course id to loadQuizFromFileUpload()
-
         return await loadQuizFromQuestionBank(selectCourseId!, options);
       }
 
-      return await loadQuizFromFileUpload(user, options);
+      return await loadQuizFromFileUpload(user, selectCourseId!, options);
     } on Object catch (e) {
       print('Load quiz error: $e');
       return null;

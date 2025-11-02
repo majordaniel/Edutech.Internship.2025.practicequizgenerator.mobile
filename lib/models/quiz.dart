@@ -25,16 +25,17 @@ class Question {
 
 class Quiz {
   final int id;
+  final String courseTitle;
   List<Question> questions;
   int get length => questions.length;
 
-  Quiz._(this.id, this.questions);
+  Quiz._(this.id, this.courseTitle, this.questions);
 
-  factory Quiz.fromQuestions(int id, List<Question> questions) {
-    return Quiz._(id, questions);
+  factory Quiz.fromQuestions(int id, String courseTitle, List<Question> questions) {
+    return Quiz._(id, courseTitle, questions);
   }
 
-  factory Quiz.fromList(int id, List<dynamic> questions) {
+  factory Quiz.fromList(int id, String courseTitle, List<dynamic> questions) {
     List<Question> qs = [];
     for (Map<String, dynamic> quizMap in questions) {
       if (quizMap case {
@@ -58,7 +59,7 @@ class Quiz {
       }
     }
 
-    return Quiz._(id, qs);
+    return Quiz._(id, courseTitle, qs);
   }
 
   @override

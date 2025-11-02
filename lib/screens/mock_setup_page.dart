@@ -374,7 +374,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
     );
   }
 
-  Future<Quiz> loadQuiz(User user, QuestionGenerateOptions options) async {
+  Future<Quiz?> loadQuiz(User user, QuestionGenerateOptions options) async {
     var opts = options.toJson();
     opts['UserId'] = user.id;
 
@@ -383,7 +383,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
         allowedExtensions: ['txt', 'pdf'],
         type: FileType.custom,
       );
-      if (result == null) throw 'Picker exception';
+      if (result == null) return null;
       final file = result.files[0];
       final fpath = file.path!;
       final ext = path.extension(fpath);
@@ -444,65 +444,70 @@ class _MockSetupPageState extends State<MockSetupPage> {
       builder: (context) {
         bool isLoading = true;
         Quiz? quiz;
-        return StatefulBuilder(
-          builder: (context, setState) {
-            if (quiz == null) {
-              print('loading quiz');
-              loadQuiz(userController.user, genOptions).then((q) {
-                setState(() {
-                  quiz = q;
-                  isLoading = false;
-                });
-              });
-            }
+        return FutureBuilder(
+          future: loadQuiz(userController.user, genOptions),
+          builder: (context, AsyncSnapshot asyncSnapshot) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                if (asyncSnapshot.connectionState == ConnectionState.done) {
+                  final data = asyncSnapshot.data as Quiz?;
+                  print('FutureBuilder.data = $data');
 
-            return isLoading
-                ? const CustomDialog(
-                    icon: Icons.hourglass_empty,
-                    iconPath: 'assets/icons/Edit Square.png',
-                    title: "Generating Mock Exam Questions",
-                    message: "Loading.........",
-                  )
-                : CustomDialog(
-                    icon: Icons.check_circle_outline,
-                    iconPath: 'assets/icons/Edit Square.png',
-                    title: "Mock Quiz Successfully Configured",
-                    message: "Your Quiz Starts in 09:00 sec",
-                    secondaryButtonText: "Review Selections",
-                    primaryButtonText: "Start Quiz",
-                    primaryButtonColor: AppColors.primaryOrange,
-                    primaryBorderColor: AppColors.primaryOrange,
-                    secondaryBorderColor: AppColors.primaryOrange,
-                    // ✅ Add consistent padding inside the dialog
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 18,
-                    ),
-                    // ✅ Properly align buttons at the bottom with spacing
-                    buttonAlignment: MainAxisAlignment.spaceBetween,
-                    onSecondaryPressed: () {
-                      Navigator.pop(context);
-                    },
+                  setState(() {
+                    isLoading = false;
+                    quiz = data;
+                  });
+                }
 
-                    onPrimaryPressed: () {
-                      if (mounted) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return QuizScreen(
-                                quiz: quiz!,
-                                duration: Duration(
-                                  minutes: minutes,
-                                  seconds: seconds,
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }
-                    },
-                  );
+                return isLoading
+                    ? const CustomDialog(
+                        icon: Icons.hourglass_empty,
+                        iconPath: 'assets/icons/Edit Square.png',
+                        title: "Generating Mock Exam Questions",
+                        message: "Loading.........",
+                      )
+                    : CustomDialog(
+                        icon: Icons.check_circle_outline,
+                        iconPath: 'assets/icons/Edit Square.png',
+                        title: "Mock Quiz Successfully Configured",
+                        message: "Your Quiz Starts in 09:00 sec",
+                        secondaryButtonText: "Review Selections",
+                        primaryButtonText: "Start Quiz",
+                        primaryButtonColor: AppColors.primaryOrange,
+                        primaryBorderColor: AppColors.primaryOrange,
+                        secondaryBorderColor: AppColors.primaryOrange,
+                        // ✅ Add consistent padding inside the dialog
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 18,
+                        ),
+                        // ✅ Properly align buttons at the bottom with spacing
+                        buttonAlignment: MainAxisAlignment.spaceBetween,
+                        onSecondaryPressed: () {
+                          Navigator.pop(context);
+                        },
+
+                        onPrimaryPressed: () {
+                          if (quiz is Quiz && mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return QuizScreen(
+                                    quiz: quiz!,
+                                    duration: Duration(
+                                      minutes: minutes,
+                                      seconds: seconds,
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          }
+                        },
+                      );
+              },
+            );
           },
         );
       },

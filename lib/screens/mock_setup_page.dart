@@ -181,9 +181,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         future: courses,
                         initialData: [Course('4444', title: 'A Darned Course')],
                         builder: (context, asyncSnapshot) {
-                          var dropdownItems = [
-                            DropdownMenuItem(child: Text('Error')),
-                          ];
+                          var dropdownItems = <DropdownMenuItem>[];
 
                           if (asyncSnapshot.connectionState ==
                               ConnectionState.done) {
@@ -210,41 +208,33 @@ class _MockSetupPageState extends State<MockSetupPage> {
                                   )
                                   .toList(growable: false);
                             }
-
-                            return DropdownButtonFormField(
-                              dropdownColor: AppColors.primaryWhite,
-                              // initialValue: selectCourseId,
-                              icon: const Icon(Icons.keyboard_arrow_down),
-                              items: dropdownItems,
-                              onChanged: (course) async {
-                                for (final c in (await courses)) {
-                                  if (c.title == course) {
-                                    setState(() {
-                                      print(
-                                        'course changed to "$course:${c.id}"',
-                                      );
-                                      selectCourseId = c.id;
-                                    });
-                                  }
-                                }
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Choose a course from your program',
-                                hintStyle: Helper.hintStyle,
-                                border: Helper.decoration,
-                                focusedBorder: Helper.decoration,
-                                filled: true,
-                                fillColor: Colors.transparent,
-                              ),
-                            );
                           }
 
                           return DropdownButtonFormField(
                             dropdownColor: AppColors.primaryWhite,
-                            initialValue: selectCourseId,
+                            // initialValue: selectCourseId,
                             icon: const Icon(Icons.keyboard_arrow_down),
                             items: dropdownItems,
-                            onChanged: (_) => (),
+                            onChanged: (course) async {
+                              for (final c in (await courses)) {
+                                if (c.title == course) {
+                                  setState(() {
+                                    print(
+                                      'course changed to "$course:${c.id}"',
+                                    );
+                                    selectCourseId = c.id;
+                                  });
+                                }
+                              }
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Choose a course from your program',
+                              hintStyle: Helper.hintStyle,
+                              border: Helper.decoration,
+                              focusedBorder: Helper.decoration,
+                              filled: true,
+                              fillColor: Colors.transparent,
+                            ),
                           );
                         },
                       ),

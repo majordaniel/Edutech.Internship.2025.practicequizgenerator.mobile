@@ -1,8 +1,10 @@
 class Question {
+  final String id;
   final int correctIdx;
   List<String> options;
   String question;
-  Question({
+  Question(
+    this.id, {
     required this.question,
     required this.options,
     required this.correctIdx,
@@ -28,6 +30,10 @@ class Quiz {
 
   Quiz._(this.id, this.questions);
 
+  factory Quiz.fromQuestions(int id, List<Question> questions) {
+    return Quiz._(id, questions);
+  }
+
   factory Quiz.fromList(int id, List<dynamic> questions) {
     List<Question> qs = [];
     for (Map<String, dynamic> quizMap in questions) {
@@ -41,6 +47,7 @@ class Quiz {
         ).map((o) => o['text'] as String).toList();
         qs.add(
           Question(
+            'fake-question-id',
             question: question,
             options: options,
             correctIdx: correctOptionIndex,

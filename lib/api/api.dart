@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:dio/dio.dart' show BaseOptions, Dio, DioException;
 import 'package:dio/src/response.dart';
 import 'package:quiz_generator/models/course.dart';
+import 'package:quiz_generator/models/quiz.dart' show Question;
 import 'package:quiz_generator/models/user.dart' show User;
 
 bool _initialised = false;
@@ -179,6 +180,68 @@ class Api {
     }
 
     throw 'fetchUser: ${response.message}';
+  }
+
+  Future<List<Question>> fetchQuestionsFromBank(String courseId) async {
+    final response = await _responseOrThrow(
+      dio.get('/QuestionBank/course/id/$courseId'),
+      'QuestionsFromBank failed',
+    );
+
+
+    if (response.succeeded && response.data != null) {
+      if (response.data case {
+        // 'courseTitle': String courseTitle,
+        'totalQuestions': int numQuestions,
+        'questions': List questions,
+      }) {
+        return List<Question>.generate(numQuestions, (i) {
+          final question = questions[i];
+          switch (question) {
+            case {
+              // 'questionType': ,
+              // 'correctAnswer': ,
+              // 'source': ,
+              // 'courseId': _,
+              'id': String questionId,
+              'options': List opts,
+              'text': String questionText,
+            }:
+              int correctOptionIndex = -1; // -1 is a marker
+              final options = List.generate(opts.length, (i) {
+                switch (opts[i]) {
+                  case {
+                    // 'optionLabel': _,
+                    'optionText': String text,
+                    'isCorrect': bool isCorrect,
+                  }:
+                    if (isCorrect) {
+                      correctOptionIndex = i;
+                    }
+                    return text;
+                  case _:
+                    throw 'Unmatched options shape: ${opts[i]}';
+                }
+              });
+
+              if (correctOptionIndex == -1) {
+                throw 'Correct option index cannot be -1: culprit: $question';
+              }
+
+              return Question(
+                questionId,
+                question: questionText,
+                options: options,
+                correctIdx: correctOptionIndex,
+              );
+
+            case _:
+              throw 'Unmatched shape: $question';
+          }
+        }, growable: false);
+      }
+    }
+    throw 'fetchQuestionsFromBank: ${response.message}: $courseId';
   }
 
   Future<ApiResponse> _responseOrThrow(

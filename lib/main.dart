@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:quiz_generator/models/question_bank.dart';
 import 'package:quiz_generator/models/user.dart';
 import 'package:quiz_generator/platform_api.dart';
 import 'screens/start_up/splash_screen.dart';
@@ -17,6 +18,8 @@ final userController = UserController(
 final PlatformApi platformApi = Platform.isAndroid
     ? AndroidApi()
     : throw "iOS is unimplemented";
+
+final questionBank = QuestionBank.init(api);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

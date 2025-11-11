@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:quiz_generator/api/api.dart';
 import 'package:quiz_generator/main.dart';
 import 'package:quiz_generator/screens/start_up/bottom_nav.dart';
-
 import '../../constant/color.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
-
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -18,11 +16,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController studentIdController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   bool loading = false;
   bool _rememberMe = false;
   bool _showPassword = false;
-
   Widget checkbox() {
     return Checkbox(
       value: _rememberMe,
@@ -39,10 +35,11 @@ class _LoginPageState extends State<LoginPage> {
     final studentId = studentIdController.text;
     final password = passwordController.text;
     String errMsg = '';
-
     setState(() => loading = true);
+
     try {
       final user = await api.login(studentId, password);
+      print("🚀 LOGIN BUTTON PRESSED");
       setState(() => loading = false);
       userController.update(user);
       print('login/message: success: $user');
@@ -57,14 +54,13 @@ class _LoginPageState extends State<LoginPage> {
         case ApiLoginError(message: var message):
           errMsg = message;
         case ApiTimeoutError():
-          errMsg = 'Network error. Please try again after some time.';
+          errMsg = 'Time Out. Please try again after some time.';
         case ApiRequestError():
           errMsg = 'Network error. Please try again after some time.';
         case _:
           errMsg = 'An error has occurred: Please try again after some time.';
       }
       print('E: $e');
-
       if (mounted) {
         await showOkAlertDialog(
           context: context,
@@ -220,11 +216,7 @@ class _LoginPageState extends State<LoginPage> {
                               alignment: Alignment.centerRight,
                               child: InkWell(
                                 onTap: () {
-                                  // Navigator.of(context).push(
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => const ForgotPassword(),
-                                  //   ),
-                                  // );
+                                  // Navigator.of(context).push( // MaterialPageRoute( // builder: (context) => const ForgotPassword(), // ), // );
                                 },
                                 child: Text(
                                   "Remember me",
@@ -241,11 +233,7 @@ class _LoginPageState extends State<LoginPage> {
                               alignment: Alignment.centerRight,
                               child: InkWell(
                                 onTap: () {
-                                  // Navigator.of(context).push(
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => const ForgotPassword(),
-                                  //   ),
-                                  // );
+                                  // Navigator.of(context).push( // MaterialPageRoute( // builder: (context) => const ForgotPassword(), // ), // );
                                 },
                                 child: Text(
                                   "Forgot Password?",

@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:quiz_generator/screens/mock_setup_page.dart';
+import 'package:quiz_generator/screens/quiz_result_page.dart';
 import 'package:quiz_generator/screens/review_questions_screen.dart';
+import 'package:quiz_generator/widgets/custom_text.dart';
 import '../constant/color.dart';
 import '../models/quiz.dart';
 import '../widgets/quiz_progress_bar.dart';
@@ -127,276 +129,315 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.primaryWhite,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryWhite,
-        elevation: 0,
-        title: const Text(
-          "Data Science Practice Quiz",
-          style: TextStyle(
-            color: AppColors.primaryDeepBlack,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: false,
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.horizontal(
-                  left: Radius.circular(13),
-                  right: Radius.circular(13),
-                ),
-                border: Border.all(width: 0.24, color: AppColors.primaryGrey),
-              ),
-              child: SizedBox(
-                width: 69,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: Padding(
-                  padding: const EdgeInsets.all(3.25),
-                  child: Row(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.timer_outlined,
-                        color: AppColors.primaryDeepBlack,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        '$remMinutes:$remSeconds',
-                        style: TextStyle(
-                          color: AppColors.primaryDeepBlack,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            QuizProgressBar(
-              progress: selectedAnswers.whereType<int>().length / quiz.length,
-            ),
-            const SizedBox(height: 24),
-
-            // Question header + badge
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "Question ${currentIndex + 1}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                    color: AppColors.primaryDeepBlack,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isAnswered
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isAnswered ? Colors.green : Colors.red,
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Text(
-                    isAnswered ? "Answered" : "Unanswered",
-                    style: TextStyle(
-                      color: isAnswered ? Colors.green : Colors.red,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 11,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            // Question card
-            QuestionCard(
-              question: q,
-              options: question.options,
-              selectedIndex: selectedAnswers[currentIndex],
-              onOptionSelected: (index) {
-                setState(() {
-                  selectedAnswers[currentIndex] = index;
-                  selectedOption = index;
-                });
-              },
-            ),
-            const SizedBox(height: 24),
-
-            // Navigation
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (currentIndex > 0)
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        currentIndex--;
-                        selectedOption = selectedAnswers[currentIndex];
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryLightBlack,
-                      foregroundColor: AppColors.primaryWhite,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 14,
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.arrow_back_ios_new, size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          "Prev",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                      Row(
+                        children: [
+                          // Back Arrow Button
+                          IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_ios_new,
+                              color: AppColors.primaryDeepBlack,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                const Spacer(),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOrange,
-                    foregroundColor: AppColors.primaryWhite,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 14,
-                    ),
-                  ),
-                  onPressed: () {
-                    if (currentIndex < quiz.questions.length - 1) {
-                      setState(() {
-                        currentIndex++;
-                        selectedOption = selectedAnswers[currentIndex];
-                      });
-                    } else {
-                      final answeredCount = selectedAnswers
-                          .where((a) => a != null)
-                          .length;
-                      final unansweredCount =
-                          quiz.questions.length - answeredCount;
-                      _showSubmitDialog(
-                        context,
-                        answeredCount,
-                        unansweredCount,
-                      );
-                    }
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        currentIndex < quiz.questions.length - 1
-                            ? "Next"
-                            : "Submit",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Icon(
-                        currentIndex < quiz.length - 1
-                            ? Icons.arrow_forward_ios
-                            : Icons.check_circle_outline,
-                        size: 16,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // ✅ Question Navigator (restored)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.primaryGrey),
-                borderRadius: BorderRadius.circular(10),
-                color: AppColors.primaryWhite,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Question Navigator",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryDeepBlack,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: List.generate(quiz.questions.length, (index) {
-                      final isAnswered = selectedAnswers[index] != null;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            currentIndex = index;
-                            selectedOption = selectedAnswers[index];
-                          });
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: isAnswered
-                                ? AppColors.primaryOrange
-                                : Colors.transparent,
-                            border: Border.all(color: AppColors.primaryGrey),
-                            borderRadius: BorderRadius.circular(6),
+                          const SizedBox(width: 5),
+                          const Spacer(),
+                          Icon(
+                            Icons.notifications_none,
+                            color: AppColors.primaryBlack,
+                            size: 24.0,
                           ),
-                          child: Text(
-                            "${index + 1}",
-                            style: TextStyle(
-                              color: isAnswered
-                                  ? AppColors.primaryWhite
-                                  : AppColors.primaryDeepBlack,
-                              fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          CustomText(
+                            title: "Data Science Practice Quiz",
+                            size: 16,
+                            color: AppColors.primaryDeepBlack,
+                            fontWeight: FontWeight.w700,
+                          ),
+
+                          Spacer(),
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.horizontal(
+                                left: Radius.circular(13),
+                                right: Radius.circular(13),
+                              ),
+                              border: Border.all(
+                                width: 0.24,
+                                color: AppColors.primaryGrey,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(3.25),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.timer_outlined,
+                                    color: AppColors.primaryDeepBlack,
+                                  ),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    '$remMinutes:$remSeconds',
+                                    style: TextStyle(
+                                      color: AppColors.primaryDeepBlack,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
+                        ],
+                      ),
+                      QuizProgressBar(
+                        progress:
+                            selectedAnswers.whereType<int>().length /
+                            quiz.length,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Question header + badge
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Question ${currentIndex + 1}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: AppColors.primaryDeepBlack,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isAnswered
+                                  ? Colors.green.withOpacity(0.1)
+                                  : Colors.red.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isAnswered ? Colors.green : Colors.red,
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Text(
+                              isAnswered ? "Answered" : "Unanswered",
+                              style: TextStyle(
+                                color: isAnswered ? Colors.green : Colors.red,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Question card
+                      QuestionCard(
+                        question: q,
+                        options: question.options,
+                        selectedIndex: selectedAnswers[currentIndex],
+                        onOptionSelected: (index) {
+                          setState(() {
+                            selectedAnswers[currentIndex] = index;
+                            selectedOption = index;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Navigation
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (currentIndex > 0)
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  currentIndex--;
+                                  selectedOption =
+                                      selectedAnswers[currentIndex];
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryLightBlack,
+                                foregroundColor: AppColors.primaryWhite,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 14,
+                                ),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.arrow_back_ios_new, size: 18),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    "Prev",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          const Spacer(),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryOrange,
+                              foregroundColor: AppColors.primaryWhite,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 14,
+                              ),
+                            ),
+                            onPressed: () {
+                              if (currentIndex < quiz.questions.length - 1) {
+                                setState(() {
+                                  currentIndex++;
+                                  selectedOption =
+                                      selectedAnswers[currentIndex];
+                                });
+                              } else {
+                                final answeredCount = selectedAnswers
+                                    .where((a) => a != null)
+                                    .length;
+                                final unansweredCount =
+                                    quiz.questions.length - answeredCount;
+                                _showSubmitDialog(
+                                  context,
+                                  answeredCount,
+                                  unansweredCount,
+                                );
+                              }
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  currentIndex < quiz.questions.length - 1
+                                      ? "Next"
+                                      : "Submit",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Icon(
+                                  currentIndex < quiz.length - 1
+                                      ? Icons.arrow_forward_ios
+                                      : Icons.check_circle_outline,
+                                  size: 16,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // ✅ Question Navigator (restored)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.primaryGrey),
+                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.primaryWhite,
                         ),
-                      );
-                    }),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Question Navigator",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryDeepBlack,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: List.generate(quiz.questions.length, (
+                                index,
+                              ) {
+                                final isAnswered =
+                                    selectedAnswers[index] != null;
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      currentIndex = index;
+                                      selectedOption = selectedAnswers[index];
+                                    });
+                                  },
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: isAnswered
+                                          ? AppColors.primaryOrange
+                                          : Colors.transparent,
+                                      border: Border.all(
+                                        color: AppColors.primaryGrey,
+                                      ),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      "${index + 1}",
+                                      style: TextStyle(
+                                        color: isAnswered
+                                            ? AppColors.primaryWhite
+                                            : AppColors.primaryDeepBlack,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -538,8 +579,49 @@ class _QuizScreenState extends State<QuizScreen> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(ctx);
-                  _showResultDialog(context);
+                  // Navigator.pop(ctx);
+                  // _showResultDialog(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuizResultPage(
+                        totalQuestions: quiz.questions.length,
+                        correctAnswers: selectedAnswers
+                            .where(
+                              (answer) =>
+                                  answer != null &&
+                                  (quiz.questions[selectedAnswers.indexOf(
+                                                answer,
+                                              )]
+                                              as dynamic)
+                                          .correctOptionIndex ==
+                                      answer,
+                            )
+                            .length,
+                        totalScore: selectedAnswers
+                            .where(
+                              (answer) =>
+                                  answer != null &&
+                                  (quiz.questions[selectedAnswers.indexOf(
+                                                answer,
+                                              )]
+                                              as dynamic)
+                                          .correctOptionIndex ==
+                                      answer,
+                            )
+                            .length, // or use your scoring logic
+                        questionReview: List.generate(
+                          quiz.questions.length,
+                          (index) => {
+                            'question': quiz.questions[index].question,
+                            'selectedAnswer': selectedAnswers[index],
+                            'correctAnswer': (quiz.questions[index] as dynamic)
+                                .correctOptionIndex,
+                          },
+                        ),
+                      ),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryOrange,
@@ -554,7 +636,10 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
                 child: const Text(
                   "Submit",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 10.95,
+                  ),
                 ),
               ),
             ],
@@ -568,35 +653,63 @@ class _QuizScreenState extends State<QuizScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.19)),
-        title: const Text(
-          "Mock Quiz Successfully Submitted",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2E2E2E),
-          ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 24,
         ),
-        content: const Text("Mock quiz completed"),
-        actions: [
-          Center(
-            child: ElevatedButton(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              "Mock Quiz Successfully Submitted",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryDeepBlack,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              "Mock quiz completed",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primaryLightBlack,
+                fontSize: 10,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
               onPressed: () {
                 Navigator.pop(ctx);
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const MockSetupPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const MockSetupPage(),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryOrange,
                 foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(2.19),
+                ),
               ),
               child: const Text(
                 "View Result",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 10.95),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

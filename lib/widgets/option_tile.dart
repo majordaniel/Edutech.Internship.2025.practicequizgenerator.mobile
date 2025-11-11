@@ -4,13 +4,15 @@ import '../constant/color.dart';
 class OptionTile extends StatelessWidget {
   final String text;
   final bool isSelected;
-  final VoidCallback onTap;
+  final isCorrect;
+  final VoidCallback? onTap;
 
   const OptionTile({
     super.key,
     required this.text,
     required this.isSelected,
-    required this.onTap,
+    this.isCorrect,
+    this.onTap,
   });
 
   @override

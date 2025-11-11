@@ -428,7 +428,11 @@ class _MockSetupPageState extends State<MockSetupPage> {
       print('loaded $questions from question bank');
 
       final courseTitle = await _courseTitle(courseId);
-      return Quiz.fromQuestions(4444, courseTitle!, questions);
+      return Quiz(
+        id: 4444,
+        courseTitle: courseTitle!,
+        questions: questions,
+      );
     } on Object catch (e) {
       print('LoadQuizFromQuestionBank/error: $e');
       rethrow;
@@ -483,7 +487,11 @@ class _MockSetupPageState extends State<MockSetupPage> {
         'questions': List<dynamic> questions,
       }) {
         final courseTitle = await _courseTitle(courseId);
-        var quiz = Quiz.fromList(66, courseTitle!, questions);
+        var quiz = Quiz.fromList(
+          id: 66,
+          courseTitle: courseTitle!,
+          questionsList: questions,
+        );
         return quiz;
       }
     }
@@ -548,7 +556,7 @@ class _MockSetupPageState extends State<MockSetupPage> {
                         iconPath: 'assets/icons/Edit Square.png',
                         title: 'Error',
                         message: // TODO: adapt this to different error situations
-                            "That course is currently not in the question bank.\nReport to your mumsy.",
+                            "That course is currently not in the question bank. Please try uploading course materials to generate questions.",
                         primaryButtonText: 'Ok',
                         onPrimaryPressed: () {
                           Navigator.pop(context);

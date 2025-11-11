@@ -1,65 +1,137 @@
 class Question {
   final String id;
-  final int correctIdx;
-  List<String> options;
-  String question;
-  Question(
+  final String question;
+  final List<String> options;
+  final int correctOptionIndex;
+
+  const Question(
     this.id, {
     required this.question,
     required this.options,
-    required this.correctIdx,
+    required this.correctOptionIndex,
   });
+
+  factory Question.fromMap(Map<String, dynamic> map) {
+    final opts =
+        (map['options'] as List?)?.map((e) => e.toString()).toList() ?? [];
+    return Question(
+      map['id']?.toString() ?? 'unknown',
+      question:
+          map['text']?.toString() ??
+          map['questionText']?.toString() ??
+          'No question',
+      options: opts,
+      correctOptionIndex: map['correctOptionIndex'] as int? ?? 0,
+    );
+  }
 
   @override
   String toString() {
-    var tos = StringBuffer();
-    tos.writeln('$question\n');
-    for (int i = 0; i < options.length; i += 1) {
-      tos.writeln('${i + 1}. ${options[i]}');
-    }
-    tos.writeln('\nCorrect option: $correctIdx. ${options[correctIdx]}');
+    final buffer = StringBuffer()
+      ..writeln(question)
+      ..writeln();
 
-    return tos.toString();
+    for (int i = 0; i < options.length; i++) {
+      buffer.writeln('${i + 1}. ${options[i]}');
+    }
+
+    if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
+      buffer.writeln(
+        '\nCorrect option: ${correctOptionIndex + 1}. ${options[correctOptionIndex]}',
+      );
+    } else {
+      buffer.writeln('\nNo correct option specified');
+    }
+    return buffer.toString();
   }
 }
 
 class Quiz {
   final int id;
   final String courseTitle;
-  List<Question> questions;
+  final List<Question> questions;
+
   int get length => questions.length;
 
-  Quiz._(this.id, this.courseTitle, this.questions);
+  const Quiz({
+    required this.id,
+    required this.courseTitle,
+    required this.questions,
+  });
 
-  factory Quiz.fromQuestions(int id, String courseTitle, List<Question> questions) {
-    return Quiz._(id, courseTitle, questions);
-  }
+  factory Quiz.fromList({
+    required int id,
+    required String courseTitle,
+    required List<dynamic> questionsList,
+  }) {
+    final List<Question> parsedQuestions = [];
 
-  factory Quiz.fromList(int id, String courseTitle, List<dynamic> questions) {
-    List<Question> qs = [];
-    for (Map<String, dynamic> quizMap in questions) {
-      if (quizMap case {
-        'questionText': String question,
-        'correctOptionIndex': int correctOptionIndex,
-        'options': List opts,
-      }) {
-        var options = List.castFrom<dynamic, Map<String, dynamic>>(
-          opts,
-        ).map((o) => o['text'] as String).toList();
-        qs.add(
+    for (final dynamic data in questionsList) {
+      if (data is! Map<String, dynamic>) {
+        print('Warning: Skipping invalid question format');
+        continue;
+      }
+
+      try {
+        final String questionText =
+            data['questionText']?.toString() ??
+            data['text']?.toString() ??
+            'No question text';
+
+        final List<dynamic>? rawOptions = data['options'] as List<dynamic>?;
+        if (rawOptions == null || rawOptions.isEmpty) {
+          print('Warning: Question has no options, skipping');
+          continue;
+        }
+
+        final List<String> options = rawOptions.map((opt) {
+          if (opt is Map<String, dynamic>) {
+            return opt['text']?.toString() ??
+                opt['optionText']?.toString() ??
+                'No option text';
+          }
+          return opt.toString();
+        }).toList();
+
+        if (options.isEmpty) {
+          print('Warning: Question has empty options, skipping');
+          continue;
+        }
+
+        var correctOptionIndex = 0;
+        if (data['correctOptionIndex'] is int) {
+          correctOptionIndex = data['correctOptionIndex'] as int;
+        } else if (data['correctAnswer'] != null) {
+          final correctAnswer = data['correctAnswer'].toString();
+          final idx = options.indexWhere(
+            (opt) => opt.toLowerCase() == correctAnswer.toLowerCase(),
+          );
+          correctOptionIndex = idx != -1 ? idx : 0;
+        }
+
+        if (correctOptionIndex >= options.length) {
+          correctOptionIndex = 0;
+        }
+
+        parsedQuestions.add(
           Question(
-            'fake-question-id',
-            question: question,
+            data['id']?.toString() ?? 'generated-id-${parsedQuestions.length}',
+            question: questionText,
             options: options,
-            correctIdx: correctOptionIndex,
+            correctOptionIndex: correctOptionIndex,
           ),
         );
-      } else {
-        throw 'Invalid quiz map shape: $quizMap';
+      } catch (e) {
+        print('Warning: Error parsing question: $e');
+        continue;
       }
     }
 
-    return Quiz._(id, courseTitle, qs);
+    if (parsedQuestions.isEmpty) {
+      throw ArgumentError('No valid questions could be parsed from the data');
+    }
+
+    return Quiz(id: id, courseTitle: courseTitle, questions: parsedQuestions);
   }
 
   @override
@@ -74,11 +146,14 @@ class Quiz {
 }
 
 extension GetFail on Map<String, dynamic> {
-  dynamic getFail(String k) {
+  T getFail<T>(String k) {
     if (containsKey(k)) {
-      return this[k];
-    } else {
-      throw 'Map/getFail: "$k" not found';
+      final value = this[k];
+      if (value is T) {
+        return value;
+      }
+      throw ArgumentError('Map/getFail: Value for "$k" is not of type $T');
     }
+    throw ArgumentError('Map/getFail: Key "$k" not found');
   }
 }

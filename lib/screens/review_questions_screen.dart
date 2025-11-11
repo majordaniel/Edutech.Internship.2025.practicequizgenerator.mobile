@@ -68,7 +68,7 @@ class _ReviewQuestionsScreenState extends State<ReviewQuestionsScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (index > 0) SizedBox(height: 20),
                       Text(

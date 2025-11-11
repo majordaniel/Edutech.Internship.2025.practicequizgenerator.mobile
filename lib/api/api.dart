@@ -1,8 +1,8 @@
+// lib/api/api.dart
 import 'dart:async';
-import 'package:dio/dio.dart' show BaseOptions, Dio, DioException;
-import 'package:dio/src/response.dart';
+import 'package:dio/dio.dart' show BaseOptions, Dio, DioException, Response;
 import 'package:quiz_generator/models/course.dart';
-import 'package:quiz_generator/models/quiz.dart' show Question;
+import 'package:quiz_generator/models/quiz.dart';
 import 'package:quiz_generator/models/user.dart' show User;
 
 bool _initialised = false;
@@ -31,6 +31,8 @@ class ApiResponse {
     'data': data,
   }.toString();
 
+  /// Expect the http response body to be a Map<String, dynamic> with the shape:
+  /// { statusCode: int, succeeded: bool, message: String, data: Map<String,dynamic>? }
   static ApiResponse? fromHttpResponse(Map<String, dynamic> httpResponse) {
     if (httpResponse case {
       'statusCode': int statusCode,
@@ -68,7 +70,8 @@ class Api {
 
     final baseOptions = BaseOptions(
       baseUrl: '$baseUrl/api',
-      // headers: {'X-API-Key': api.key},
+      // Add any common headers here if needed
+      // headers: {'X-API-Key': apiKey},
     );
     final dio = Dio(baseOptions);
     _api = Api._(Uri.parse(baseOptions.baseUrl), apiKey, dio);
@@ -76,16 +79,16 @@ class Api {
     return _api!;
   }
 
-  // LOGIN: Stores token and refresh token
+  /// LOGIN -> returns a User object (fetches user details after receiving token)
   Future<User> login(String email, String password) async {
-
     try {
-      final response = await dio
-          .post('/Auth/login', data: {'email': email, 'password': password})
-          .timeout(
-            loginRequestTimeout,
-            onTimeout: () => throw ApiTimeoutError(),
-          );
+      final response = await dio.post(
+        '/Auth/login',
+        data: {'email': email, 'password': password},
+      );
+
+      // debug: print raw
+      print("✅ LOGIN RAW RESPONSE:\n${response.data}");
 
       if (response.statusCode == 200) {
         final r = ApiResponse.fromHttpResponse(response.data);
@@ -94,14 +97,13 @@ class Api {
         }
 
         if (r.succeeded) {
-          print('response: $r');
+          // The actual tokens are inside r.data map
+          _token =
+              r.data?['accessToken']?.toString() ??
+              r.data?['token']?.toString();
+          _refreshToken = r.data?['refreshToken']?.toString();
 
-          final body = response.data;
-          _token = body['token'];
-          _refreshToken =
-              body['refreshToken']; // if your API returns a refresh token
-
-          // Now try to fetch the user's credentials
+          // After login, fetch user details
           return _fetchUser(email);
         } else {
           throw ApiLoginError();
@@ -114,12 +116,15 @@ class Api {
     }
   }
 
+  /// Fetch user by email and return a User instance
   Future<User> _fetchUser(String email) async {
     try {
       final getResponse = await dio.get(
         '/User/email',
         queryParameters: {'email': email},
       );
+
+      print("✅ USER DETAILS RAW RESPONSE:\n${getResponse.data}");
 
       if (getResponse.statusCode == 200) {
         final r = ApiResponse.fromHttpResponse(getResponse.data);
@@ -128,17 +133,14 @@ class Api {
         }
 
         if (r.succeeded) {
-          if (r.data! case {
-            'id': String id,
-            'firstName': String firstName,
-            'lastName': String lastName,
-          }) {
-            final username = '$firstName $lastName';
-            return User(username, id);
+          final data = r.data ?? {};
+          // safe matching: require id + either firstName/lastName or name
+          final id = data['id']?.toString() ?? '';
+          if (id.isEmpty) {
+            throw ApiRequestError('User data missing id');
           }
-          throw ApiRequestError(
-            'Internal: Response data format not matched: ${r.data}',
-          );
+
+          return User.fromJson(data);
         }
       }
       throw ApiRequestError('Unauthorized/User/email: Invalid credentials');
@@ -147,114 +149,169 @@ class Api {
     }
   }
 
+  /// Fetch courses for a student. Returns an empty list if courses is null or missing.
   Future<List<Course>> fetchUserCourse(String id) async {
-    // TODO: verify id
     final response = await _responseOrThrow(
       dio.get('/StudentCourse/$id'),
       'Unauthorized/StudentCourse: Invalid id: $id',
     );
+
+    print("📥 RESPONSE RECEIVED (fetchUserCourse): ${response.data}");
+
     if (response.succeeded && response.data != null) {
-      if (response.data case {
-        'studentId': _, // TODO: verify against `id`
-        'courses': List courses,
-      }) {
-        return courses
-            .map(
-              (maybeCourse) => switch (maybeCourse) {
-                {
-                  'id': String courseId,
-                  'title': String courseTitle,
-                  // 'code': _,
-                  // 'creditUnit': _,
-                  // 'semester': _,
-                } =>
-                  Course(courseId, title: courseTitle),
-                _ => throw ApiRequestError(
-                  'Internal: Response data format not matched: <$maybeCourse\n${response.data}>',
-                ),
-              },
-            )
-            .toList(growable: false);
-      }
+      final data = response.data!;
+      final coursesRaw = (data['courses'] as List?) ?? [];
+      final parsed = coursesRaw
+          .map((maybeCourse) {
+            if (maybeCourse case {
+              'id': String courseId,
+              'title': String courseTitle,
+            }) {
+              return Course(courseId, title: courseTitle);
+            } else {
+              // Fallback: handle loosely-typed course objects
+              final courseId = maybeCourse['id']?.toString() ?? '';
+              final courseTitle =
+                  maybeCourse['title']?.toString() ?? 'Untitled';
+              return Course(courseId, title: courseTitle);
+            }
+          })
+          .toList(growable: false);
+      return parsed;
     }
 
-    throw 'fetchUser: ${response.message}';
+    // Return empty list instead of throwing to avoid crashes in UI
+    return <Course>[];
   }
 
+  /// Fetch questions from question bank for a course
   Future<List<Question>> fetchQuestionsFromBank(String courseId) async {
     final response = await _responseOrThrow(
       dio.get('/QuestionBank/course/id/$courseId'),
       'QuestionsFromBank failed',
     );
 
+    print("✅ QUESTION BANK RAW RESPONSE:\n${response.data}");
 
     if (response.succeeded && response.data != null) {
-      if (response.data case {
-        // 'courseTitle': String courseTitle,
-        'totalQuestions': int numQuestions,
-        'questions': List questions,
-      }) {
-        return List<Question>.generate(numQuestions, (i) {
-          final question = questions[i];
-          switch (question) {
-            case {
-              // 'questionType': ,
-              // 'correctAnswer': ,
-              // 'source': ,
-              // 'courseId': _,
-              'id': String questionId,
-              'options': List opts,
-              'text': String questionText,
-            }:
-              int correctOptionIndex = -1; // -1 is a marker
-              final options = List.generate(opts.length, (i) {
-                switch (opts[i]) {
-                  case {
-                    // 'optionLabel': _,
-                    'optionText': String text,
-                    'isCorrect': bool isCorrect,
-                  }:
-                    if (isCorrect) {
-                      correctOptionIndex = i;
-                    }
-                    return text;
-                  case _:
-                    throw 'Unmatched options shape: ${opts[i]}';
-                }
-              });
+      final data = response.data!;
+      final numQuestions = (data['totalQuestions'] is int)
+          ? data['totalQuestions'] as int
+          : (data['totalQuestions']?.toString() ?? '0') == '0'
+          ? 0
+          : (data['totalQuestions'] as int? ?? 0);
+      final questionsRaw = (data['questions'] as List?) ?? [];
 
-              if (correctOptionIndex == -1) {
-                throw 'Correct option index cannot be -1: culprit: $question';
-              }
-
-              return Question(
-                questionId,
-                question: questionText,
-                options: options,
-                correctIdx: correctOptionIndex,
-              );
-
-            case _:
-              throw 'Unmatched shape: $question';
-          }
-        }, growable: false);
+      if (questionsRaw.isEmpty) {
+        return <Question>[];
       }
+
+      return List<Question>.generate(
+        questionsRaw.length < numQuestions ? questionsRaw.length : numQuestions,
+        (i) {
+          final question = questionsRaw[i];
+          if (question is Map<String, dynamic> &&
+              question.containsKey('options') &&
+              question['options'] != null) {
+            final questionId = question['id']?.toString() ?? 'unknown';
+            final questionText =
+                question['text']?.toString() ??
+                question['questionText']?.toString() ??
+                'No question text';
+            final List opts = question['options'] as List;
+            int correctOptionIndex = -1;
+            final options = List<String>.generate(opts.length, (j) {
+              final opt = opts[j];
+              if (opt is Map<String, dynamic>) {
+                final bool isCorrect = opt['isCorrect'] == true;
+                final String text =
+                    opt['optionText']?.toString() ??
+                    opt['text']?.toString() ??
+                    'Option ${j + 1}';
+                if (isCorrect) correctOptionIndex = j;
+                return text;
+              } else {
+                return opt?.toString() ?? 'Option ${j + 1}';
+              }
+            });
+
+            if (correctOptionIndex == -1) {
+              // try to use provided correctAnswer if present and is a letter/label
+              final maybeLabel = question['correctAnswer'];
+              if (maybeLabel != null) {
+                // attempt to find option with optionLabel == maybeLabel
+                for (var k = 0; k < opts.length; k++) {
+                  final opt = opts[k];
+                  if (opt is Map &&
+                      opt['optionLabel'] != null &&
+                      opt['optionLabel'].toString().toLowerCase() ==
+                          maybeLabel.toString().toLowerCase()) {
+                    correctOptionIndex = k;
+                    break;
+                  }
+                }
+              }
+            }
+
+            if (correctOptionIndex == -1) {
+              // fallback: choose 0 to avoid crash (still log)
+              print(
+                '⚠️ Warning: correct option not found for questionId=$questionId; defaulting to 0',
+              );
+              correctOptionIndex = 0;
+            }
+
+            return Question(
+              questionId,
+              question: questionText,
+              options: options,
+              correctOptionIndex: correctOptionIndex,
+            );
+          } else {
+            // fallback conversion for unexpected shape
+            final qid = question['id']?.toString() ?? 'unknown';
+            final text =
+                question['text']?.toString() ??
+                question['questionText']?.toString() ??
+                'No question text';
+            final optsRaw = (question['options'] as List?) ?? [];
+            final opts = optsRaw
+                .map(
+                  (o) => (o is Map
+                      ? (o['optionText'] ?? o['text'] ?? o.toString())
+                      : o.toString()),
+                )
+                .map((e) => e.toString())
+                .toList();
+            return Question(
+              qid,
+              question: text,
+              options: opts,
+              correctOptionIndex: 0,
+            );
+          }
+        },
+        growable: false,
+      );
     }
-    throw 'fetchQuestionsFromBank: ${response.message}: $courseId';
+
+    return <Question>[];
   }
 
+  /// Helper that turns Dio Response into ApiResponse or throws errors
   Future<ApiResponse> _responseOrThrow(
     Future<Response> dioFuture,
     String throwMessage,
   ) async {
     try {
       final response = await dioFuture;
+      print("📥 RESPONSE RECEIVED: ${response.data}");
+
       if (response.statusCode == 200) {
         final r = ApiResponse.fromHttpResponse(response.data);
         if (r == null) {
           throw ApiRequestError('Http error');
         }
-
         return r;
       }
       throw ApiRequestError(throwMessage);
@@ -264,6 +321,7 @@ class Api {
   }
 }
 
+/// Specific errors
 class ApiLoginError extends ApiRequestError {
   ApiLoginError() : super('Login failed: email or password incorrect');
 }
@@ -272,9 +330,7 @@ class ApiTimeoutError extends Error {}
 
 class ApiRequestError extends Error {
   final String message;
-
   ApiRequestError(this.message);
-
   @override
   String toString() => message;
 }
